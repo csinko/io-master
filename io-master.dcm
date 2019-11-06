@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ADA4522-4
+D 55 V, EMI Enhanced, Zero Drift, Ultralow Noise, Rail-to-Rail Output Operational Amplifiers
+K quad opamp
+F https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522-1_4522-2_4522-4.pdf
+$ENDCMP
+#
+#End Doc Library
