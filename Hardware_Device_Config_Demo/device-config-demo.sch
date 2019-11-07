@@ -2269,7 +2269,7 @@ F 3 "~" H 5650 1950 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L io_master:ADA4522-4 U1
+L io-master:ADA4522-4 U1
 U 1 1 5DC5589D
 P 13550 2700
 F 0 "U1" H 13550 2550 50  0000 L CNN
@@ -2280,7 +2280,7 @@ F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522
 	1    0    0    1   
 $EndComp
 $Comp
-L io_master:ADA4522-4 U1
+L io-master:ADA4522-4 U1
 U 5 1 5DC5BB84
 P 13550 2700
 F 0 "U1" H 13550 2850 50  0001 L CNN
@@ -2291,7 +2291,7 @@ F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522
 	1    0    0    -1  
 $EndComp
 $Comp
-L io_master:ADA4522-4 U1
+L io-master:ADA4522-4 U1
 U 2 1 5DC6E8EE
 P 13550 4250
 F 0 "U1" H 13550 4100 50  0000 L CNN
@@ -2302,7 +2302,7 @@ F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522
 	1    0    0    1   
 $EndComp
 $Comp
-L io_master:ADA4522-4 U1
+L io-master:ADA4522-4 U1
 U 3 1 5DC6EE6E
 P 13550 5800
 F 0 "U1" H 13550 5650 50  0000 L CNN
@@ -2313,7 +2313,7 @@ F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522
 	1    0    0    1   
 $EndComp
 $Comp
-L io_master:ADA4522-4 U1
+L io-master:ADA4522-4 U1
 U 4 1 5DC6F478
 P 13550 7350
 F 0 "U1" H 13550 7200 50  0000 L CNN
@@ -2324,7 +2324,7 @@ F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522
 	1    0    0    1   
 $EndComp
 $Comp
-L io_master:LTC6906 U2
+L io-master:LTC6906 U2
 U 1 1 5DC85267
 P 5650 4500
 F 0 "U2" H 5400 4750 50  0000 C CNN

@@ -1616,17 +1616,6 @@ F 3 "~" H 8350 9550 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	8150 9550 8100 9550
-$Comp
-L level-shifter-demo-rescue:ADA4522-4-io-master U2
-U 3 1 5F30D97E
-P 7550 9000
-F 0 "U2" H 7550 9150 50  0000 L CNN
-F 1 "ADA4522-4" H 7550 8850 50  0000 L CNN
-F 2 "Package_SO:TSSOP-14_4.4x5mm_P0.65mm" H 7500 9100 50  0001 C CNN
-F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522-1_4522-2_4522-4.pdf" H 7600 9200 50  0001 C CNN
-	3    7550 9000
-	-1   0    0    -1  
-$EndComp
 Wire Wire Line
 	10200 4900 14400 4900
 Wire Wire Line
@@ -2692,17 +2681,6 @@ Wire Wire Line
 Wire Wire Line
 	2400 9350 2400 9300
 $Comp
-L level-shifter-demo-rescue:ADA4522-4-io-master U2
-U 4 1 60085F4B
-P 5650 10050
-F 0 "U2" H 5650 10200 50  0000 L CNN
-F 1 "ADA4522-4" H 5650 9900 50  0000 L CNN
-F 2 "Package_SO:TSSOP-14_4.4x5mm_P0.65mm" H 5600 10150 50  0001 C CNN
-F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522-1_4522-2_4522-4.pdf" H 5700 10250 50  0001 C CNN
-	4    5650 10050
-	-1   0    0    -1  
-$EndComp
-$Comp
 L Connector:TestPoint TP59
 U 1 1 600A2130
 P 6000 9950
@@ -2896,14 +2874,25 @@ F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522
 	-1   0    0    1   
 $EndComp
 $Comp
-L io_master:ADA4522-4 U?
-U 1 1 5DCA045C
-P 5700 9550
-F 0 "U?" H 5700 9700 50  0000 L CNN
-F 1 "ADA4522-4" H 5700 9400 50  0000 L CNN
-F 2 "Package_SO:TSSOP-14_4.4x5mm_P0.65mm" H 5650 9650 50  0001 C CNN
-F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522-1_4522-2_4522-4.pdf" H 5750 9750 50  0001 C CNN
-	1    5700 9550
+L io_master:ADA4522-4 U2
+U 4 1 5DCA045C
+P 5650 10050
+F 0 "U2" H 5650 10200 50  0000 L CNN
+F 1 "ADA4522-4" H 5650 9900 50  0000 L CNN
+F 2 "Package_SO:TSSOP-14_4.4x5mm_P0.65mm" H 5600 10150 50  0001 C CNN
+F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522-1_4522-2_4522-4.pdf" H 5700 10250 50  0001 C CNN
+	4    5650 10050
+	-1   0    0    -1  
+$EndComp
+$Comp
+L io_master:ADA4522-4 U2
+U 3 1 5DCD9D4B
+P 7550 9000
+F 0 "U2" H 7550 9150 50  0000 L CNN
+F 1 "ADA4522-4" H 7550 8850 50  0000 L CNN
+F 2 "Package_SO:TSSOP-14_4.4x5mm_P0.65mm" H 7500 9100 50  0001 C CNN
+F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522-1_4522-2_4522-4.pdf" H 7600 9200 50  0001 C CNN
+	3    7550 9000
 	-1   0    0    -1  
 $EndComp
 $EndSCHEMATC

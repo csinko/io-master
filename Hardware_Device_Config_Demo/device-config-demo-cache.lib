@@ -234,11 +234,11 @@ X ~ 2 0 -150 50 U 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# io_master_ADA4522-4
+# io-master_ADA4522-4
 #
-DEF io_master_ADA4522-4 U 0 5 Y Y 5 L N
+DEF io-master_ADA4522-4 U 0 5 Y Y 5 L N
 F0 "U" 0 200 50 H V L CNN
-F1 "io_master_ADA4522-4" 0 -200 50 H V L CNN
+F1 "io-master_ADA4522-4" 0 -200 50 H V L CNN
 F2 "" -50 100 50 H I C CNN
 F3 "" 50 200 50 H I C CNN
 $FPLIST
@@ -267,11 +267,11 @@ X V+ 4 -100 300 150 D 50 50 5 1 W
 ENDDRAW
 ENDDEF
 #
-# io_master_LTC6906
+# io-master_LTC6906
 #
-DEF io_master_LTC6906 U 0 40 Y Y 1 F N
+DEF io-master_LTC6906 U 0 40 Y Y 1 F N
 F0 "U" -300 250 50 H V C CNN
-F1 "io_master_LTC6906" 250 250 50 H V C CNN
+F1 "io-master_LTC6906" 250 250 50 H V C CNN
 F2 "" 0 0 98 H I C CNN
 F3 "" 0 0 98 H I C CNN
 DRAW
