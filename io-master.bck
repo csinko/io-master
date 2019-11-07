@@ -1,3 +1,25 @@
 EESchema-DOCLIB  Version 2.0
 #
+$CMP 74AUC1G18
+D Single Demultiplexer, Low-Voltage CMOS
+K Single Demux LVC CMOS
+F http://www.ti.com/lit/sg/scyt129e/scyt129e.pdf
+$ENDCMP
+#
+$CMP 74AUP1T157
+D LOW POWER, 1.8/2.5/3.3-V INPUT, 3.3-V CMOS OUTPUT, SINGLE 2-INPUT
+SCHMITT-TRIGGER BUFFER MULTIPLEXER (NONINVERTED)
+F https://www.ti.com/lit/ds/symlink/sn74aup1t157.pdf
+$ENDCMP
+#
+$CMP ADA4522-4
+D 55 V, EMI Enhanced, Zero Drift, Ultralow Noise, Rail-to-Rail Output Operational Amplifiers
+K quad opamp
+F https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522-1_4522-2_4522-4.pdf
+$ENDCMP
+#
+$CMP LTC6906
+D Micropower, 10kHz to 1MHz
+$ENDCMP
+#
 #End Doc Library

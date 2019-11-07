@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name io-master)(type Legacy)(uri /home/ian/Projects/io-master/io-master.lib)(options "")(descr ""))
+  (lib (name device-config-demo-rescue)(type Legacy)(uri ${KIPRJMOD}/device-config-demo-rescue.lib)(options "")(descr ""))
+)
