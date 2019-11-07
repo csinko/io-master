@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name io_master)(type Legacy)(uri /home/ian/Projects/io-master/io_master.lib)(options "")(descr ""))
+)
