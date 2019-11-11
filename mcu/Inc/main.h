@@ -50,10 +50,16 @@ extern "C" {
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+
+void DMA_TransferCompleteHandler(DMA_HandleTypeDef *DmaHandle);
+void DMA_TransferHalfHandler(DMA_HandleTypeDef *DmaHandle);
+void DMA_TransferError(DMA_HandleTypeDef *DmaHandle);
 
 /* USER CODE END EFP */
 
