@@ -58,8 +58,6 @@ static uint8_t isOn = 0;
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
-extern DMA_HandleTypeDef hdma_tim1_up;
-extern TIM_HandleTypeDef htim1;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -201,86 +199,6 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles TIM1 break interrupt.
-  */
-void TIM1_BRK_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM1_BRK_IRQn 0 */
-  if (isOn == 0) {
-    isOn = 1;
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_SET);
-  } else {
-    isOn = 0;
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_RESET);
-  }
-  /* USER CODE END TIM1_BRK_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim1);
-  /* USER CODE BEGIN TIM1_BRK_IRQn 1 */
-
-  /* USER CODE END TIM1_BRK_IRQn 1 */
-}
-
-/**
-  * @brief This function handles TIM1 update interrupt.
-  */
-void TIM1_UP_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM1_UP_IRQn 0 */
-  if (isOn == 0) {
-    isOn = 1;
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_SET);
-  } else {
-    isOn = 0;
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_RESET);
-  }
-  /* USER CODE END TIM1_UP_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim1);
-  /* USER CODE BEGIN TIM1_UP_IRQn 1 */
-
-  /* USER CODE END TIM1_UP_IRQn 1 */
-}
-
-/**
-  * @brief This function handles TIM1 trigger and commutation interrupts.
-  */
-void TIM1_TRG_COM_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM1_TRG_COM_IRQn 0 */
-  if (isOn == 0) {
-    isOn = 1;
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_SET);
-  } else {
-    isOn = 0;
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_RESET);
-  }
-  /* USER CODE END TIM1_TRG_COM_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim1);
-  /* USER CODE BEGIN TIM1_TRG_COM_IRQn 1 */
-
-  /* USER CODE END TIM1_TRG_COM_IRQn 1 */
-}
-
-/**
-  * @brief This function handles TIM1 capture compare interrupt.
-  */
-void TIM1_CC_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM1_CC_IRQn 0 */
-  if (isOn == 0) {
-    isOn = 1;
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_SET);
-  } else {
-    isOn = 0;
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_RESET);
-  }
-  /* USER CODE END TIM1_CC_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim1);
-  /* USER CODE BEGIN TIM1_CC_IRQn 1 */
-
-  /* USER CODE END TIM1_CC_IRQn 1 */
-}
-
-/**
   * @brief This function handles EXTI line[15:10] interrupts.
   */
 void EXTI15_10_IRQHandler(void)
@@ -295,20 +213,6 @@ void EXTI15_10_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles DMA2 stream0 global interrupt.
-  */
-void DMA2_Stream0_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
-
-  /* USER CODE END DMA2_Stream0_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_tim1_up);
-  /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
-
-  /* USER CODE END DMA2_Stream0_IRQn 1 */
-}
-
-/**
   * @brief This function handles USB On The Go FS global interrupt.
   */
 void OTG_FS_IRQHandler(void)
@@ -320,21 +224,6 @@ void OTG_FS_IRQHandler(void)
   /* USER CODE BEGIN OTG_FS_IRQn 1 */
 
   /* USER CODE END OTG_FS_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMAMUX1 overrun interrupt.
-  */
-void DMAMUX1_OVR_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 0 */
-
-  /* USER CODE END DMAMUX1_OVR_IRQn 0 */
-  // Handle DMA2_Stream0
-  HAL_DMAEx_MUX_IRQHandler(&hdma_tim1_up);
-  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 1 */
-
-  /* USER CODE END DMAMUX1_OVR_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

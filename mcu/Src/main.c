@@ -24,7 +24,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "generate_data.h"
 
 /* USER CODE END Includes */
 
@@ -35,6 +34,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#if defined( __ICCARM__ )
+  #define DMA_BUFFER \
+      _Pragma("location=\".dma_buffer\"")
+#else
+  #define DMA_BUFFER \
+      __attribute__((section(".dma_buffer")))
+#endif
 
 /* USER CODE END PD */
 
@@ -45,9 +51,9 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-TIM_HandleTypeDef htim1;
-DMA_HandleTypeDef hdma_tim1_up;
+TIM_HandleTypeDef htim8;
 
+DMA_HandleTypeDef hdma_dma_generator0;
 /* USER CODE BEGIN PV */
 
 
@@ -57,15 +63,30 @@ DMA_HandleTypeDef hdma_tim1_up;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
-static void MX_TIM1_Init(void);
+static void MX_TIM8_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t* data;
-uint32_t output;
+DMA_BUFFER uint16_t output_buf[256];
+
+void transmit_error_handler() {
+  while(1) {
+    for (int i = 0; i < 3; i++) {
+    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_SET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_RESET);
+    HAL_Delay(100);
+    }
+    HAL_Delay(500);
+  }
+}
+
+void data_transmitted_handler() {
+  HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_SET);
+}
 
 /* USER CODE END 0 */
 
@@ -76,8 +97,6 @@ uint32_t output;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  data = malloc(16);
-  memset(data, 0xFF, 16);
   /* USER CODE END 1 */
   
 
@@ -99,23 +118,22 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_USB_DEVICE_Init();
-  MX_TIM1_Init();
+  MX_TIM8_Init();
+  MX_DMA_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_MspInit(&htim1);
-  output = 0x00000000;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  for (int i = 0; i < 256; i++) {
+    output_buf[i] = 0xFFFF;
+  }
   while (1)
   {
     HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
     HAL_Delay(100);
-    if (output == 0x00000000) {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_RESET);
-    }
+    HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_RESET);
     HAL_Delay(500);
     /* USER CODE END WHILE */
 
@@ -191,100 +209,129 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief TIM1 Initialization Function
+  * @brief TIM8 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_TIM1_Init(void)
+static void MX_TIM8_Init(void)
 {
 
-  /* USER CODE BEGIN TIM1_Init 0 */
+  /* USER CODE BEGIN TIM8_Init 0 */
 
-  /* USER CODE END TIM1_Init 0 */
+  /* USER CODE END TIM8_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
-  /* USER CODE BEGIN TIM1_Init 1 */
+  /* USER CODE BEGIN TIM8_Init 1 */
 
-  /* USER CODE END TIM1_Init 1 */
-  htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 6400-1;
-  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 1000;
-  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;
-  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
+  /* USER CODE END TIM8_Init 1 */
+  htim8.Instance = TIM8;
+  htim8.Init.Prescaler = 1;
+  htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim8.Init.Period = 1250;
+  htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim8.Init.RepetitionCounter = 0;
+  htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim8) != HAL_OK)
   {
     Error_Handler();
   }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
+
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 500;
+  sConfigOC.Pulse = 250;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
+  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
   }
-  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
-  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-  sBreakDeadTimeConfig.DeadTime = 0;
-  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.BreakFilter = 0;
-  sBreakDeadTimeConfig.Break2State = TIM_BREAK2_DISABLE;
-  sBreakDeadTimeConfig.Break2Polarity = TIM_BREAK2POLARITY_HIGH;
-  sBreakDeadTimeConfig.Break2Filter = 0;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-  if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK)
+  sConfigOC.Pulse = 600;
+  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN TIM1_Init 2 */
-  /* USER CODE END TIM1_Init 2 */
-  HAL_TIM_MspPostInit(&htim1);
+  sConfigOC.Pulse = 670;
+  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM8_Init 2 */
+
+  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1) != HAL_OK) {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3) != HAL_OK) {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_4) != HAL_OK) {
+    Error_Handler();
+  }
+
+  htim8.hdma[TIM_DMA_ID_CC4]->XferCpltCallback = data_transmitted_handler;
+  htim8.hdma[TIM_DMA_ID_CC4]->XferErrorCallback = transmit_error_handler;
+  /* USER CODE END TIM8_Init 2 */
+  HAL_TIM_MspPostInit(&htim8);
 
 }
 
 /** 
   * Enable DMA controller clock
+  * Configure DMA for memory to memory transfers
+  *   hdma_dma_generator0
   */
 static void MX_DMA_Init(void) 
 {
+  //May need request to be one of these:
+  //
+  //#define DMA_REQUEST_TIM8_CH1         47U  /*!< DMAMUX1 TIM8 CH1 request  */
+  //#define DMA_REQUEST_TIM8_CH2         48U  /*!< DMAMUX1 TIM8 CH2 request  */
+  //#define DMA_REQUEST_TIM8_CH3         49U  /*!< DMAMUX1 TIM8 CH3 request  */
+  //#define DMA_REQUEST_TIM8_CH4         50U  /*!< DMAMUX1 TIM8 CH4 request  */
+  //#define DMA_REQUEST_TIM8_UP          51U  /*!< DMAMUX1 TIM8 UP request   */
+  //#define DMA_REQUEST_TIM8_TRIG        52U  /*!< DMAMUX1 TIM8 TRIG request */
+  //#define DMA_REQUEST_TIM8_COM         53U  /*!< DMAMUX1 TIM8 COM request  */
+  //
+  /* Local variables */
+  HAL_DMA_MuxSyncConfigTypeDef pSyncConfig = {0};
 
   /* DMA controller clock enable */
   __HAL_RCC_DMA2_CLK_ENABLE();
 
-  /* DMA interrupt init */
-  /* DMA2_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
-  /* DMAMUX1_OVR_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMAMUX1_OVR_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMAMUX1_OVR_IRQn);
+  /* Configure DMA request hdma_dma_generator0 on DMA2_Stream7 */
+  hdma_dma_generator0.Instance = DMA2_Stream7;
+  //hdma_dma_generator0.Init.Request = DMA_REQUEST_GENERATOR0;
+  hdma_dma_generator0.Init.Request = DMA_REQUEST_TIM8_CH4;
+  hdma_dma_generator0.Init.Direction = DMA_MEMORY_TO_PERIPH;
+  hdma_dma_generator0.Init.PeriphInc = DMA_PINC_DISABLE;
+  hdma_dma_generator0.Init.MemInc = DMA_MINC_DISABLE;
+  hdma_dma_generator0.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+  hdma_dma_generator0.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+  hdma_dma_generator0.Init.Mode = DMA_NORMAL;
+  hdma_dma_generator0.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+  hdma_dma_generator0.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+  hdma_dma_generator0.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_1QUARTERFULL;
+  hdma_dma_generator0.Init.MemBurst = DMA_MBURST_SINGLE;
+  hdma_dma_generator0.Init.PeriphBurst = DMA_PBURST_SINGLE;
+  __HAL_LINKDMA(&htim8, hdma[TIM_DMA_ID_CC4], hdma_dma_generator0);
+  HAL_DMA_Init(htim8.hdma[TIM_DMA_ID_CC4]);
+  HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 1, 1);
+  HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+
+  /* Configure the DMAMUX synchronization parameters for the selected DMA stream */
+//  pSyncConfig.SyncSignalID = HAL_DMAMUX1_SYNC_EXTI0;
+//  pSyncConfig.SyncPolarity = HAL_DMAMUX_SYNC_RISING_FALLING;
+//  pSyncConfig.SyncEnable = DISABLE;
+//  pSyncConfig.EventEnable = ENABLE;
+//  pSyncConfig.RequestNumber = 1;
+//  if (HAL_DMAEx_ConfigMuxSync(&hdma_dma_generator0, &pSyncConfig) != HAL_OK)
+//  {
+//    Error_Handler( );
+//  }
 
 }
 
@@ -303,7 +350,6 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
@@ -361,14 +407,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : RMII_TXD1_Pin */
-  GPIO_InitStruct.Pin = RMII_TXD1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-  HAL_GPIO_Init(RMII_TXD1_GPIO_Port, &GPIO_InitStruct);
-
   /*Configure GPIO pins : STLK_RX_Pin STLK_TX_Pin */
   GPIO_InitStruct.Pin = STLK_RX_Pin|STLK_TX_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -407,12 +445,9 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if(GPIO_Pin == USER_Btn_Pin) {
-      uint32_t* bongo = malloc(4);
-      *bongo = 0xFFFFFFFF;
-      //HAL_DMA_Start(&hdma_tim1_up, (uint32_t)&bongo, (uint32_t) &GPIOF->ODR, 4);
-      HAL_DMA_Start(&hdma_tim1_up, (uint32_t)bongo, (uint32_t) &output, 4);
-      HAL_TIM_Base_Start(&htim1);
-      //memset(&GPIOF->ODR, bongo, 1);
+      SCB_CleanDCache_by_Addr(&output_buf, 256);
+      HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)&output_buf, (uint32_t)(&GPIOF->ODR), 256);
+      __HAL_TIM_ENABLE_DMA(&htim8, TIM_DMA_CC4);
 
     }
 }
