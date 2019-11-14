@@ -1,0 +1,17 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    {
+           "name": "(gdb) Launch",
+                "cwd": "${workspacefolder}",
+                "type": "cppdbg",
+                "request": "launch",
+                "miDebuggerServerAddress": "127.0.0.1:3333",
+                "program": "${workspaceFolder}/build/stm32h7_test_led.elf",
+                "miDebuggerPath": "arm-none-eabi-gdb"
+            }
+    ]
+}
