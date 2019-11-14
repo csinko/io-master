@@ -66,6 +66,7 @@ class Button:
                 sendCommand('v3')
             
             #Wait for OKAY (z) before moving on
+            window.after(1000)
 
             if frequency == "1kHZ":
                 sendCommand('f0')
@@ -77,6 +78,7 @@ class Button:
                 sendCommand('f3')
 
             #wait for OKAY before finishing loop. (exit as necessary)
+            
 
         #Push Actions for "Send Data" Button
         if btn_text == "Send Data":
