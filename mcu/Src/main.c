@@ -68,11 +68,11 @@ static void MX_I2C2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-  void writeExtDac(float Vout)
+  uint8_t buf[8];
+  void writeAllExtDac(float Vout)
   {
     static const uint8_t EXT_DAC_ADDR = 0b1100000 << 1; // Use 8-bit address
     static const uint8_t EXT_DAC_ADDR_UPDATE = 0x00; // Use 8-bit address
-    uint8_t buf[8];
     uint8_t bufUpdate = 0x08;
     uint8_t bufVRef = 0x80;
     HAL_StatusTypeDef ret;
@@ -84,6 +84,38 @@ static void MX_I2C2_Init(void);
           buf[i] = (DAC_VALUE>>8) & 0x0F;
           buf[i+1] = DAC_VALUE;
     }    
+    ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR, &bufVRef, 1, HAL_MAX_DELAY);
+    if ( ret != HAL_OK ) 
+    {
+      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
+      while(1){}
+    }
+    ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR, &buf[0], 8, HAL_MAX_DELAY);
+    if ( ret != HAL_OK ) 
+    {
+      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
+      while(1){}
+    }
+    ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR_UPDATE, &bufUpdate, 1, HAL_MAX_DELAY);
+    if ( ret != HAL_OK ) 
+    {
+      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
+      while(1){}
+    }
+  }
+
+  void writeExtDac(uint8_t channel, float Vout)
+  {
+    static const uint8_t EXT_DAC_ADDR = 0b1100000 << 1; // Use 8-bit address
+    static const uint8_t EXT_DAC_ADDR_UPDATE = 0x00; // Use 8-bit address
+    uint8_t bufUpdate = 0x08;
+    uint8_t bufVRef = 0x80;
+    HAL_StatusTypeDef ret;
+
+    uint16_t DAC_VALUE = ((float)(4095) / (float)48) * (24 - Vout);
+    buf[2*channel-2] = (DAC_VALUE>>8) & 0x0F;
+    buf[2*channel-1] = DAC_VALUE;
+        
     ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR, &bufVRef, 1, HAL_MAX_DELAY);
     if ( ret != HAL_OK ) 
     {
@@ -158,7 +190,10 @@ int main(void)
     
     HAL_GPIO_TogglePin(GPIOB, LD1_Pin);
     HAL_Delay(1000);
-    writeExtDac(12);
+    writeExtDac(1, -12);
+    writeExtDac(2, -3.3);
+    writeExtDac(3, 16);
+    writeExtDac(4, 22);
     
     /* USER CODE END WHILE */
 
