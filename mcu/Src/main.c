@@ -68,73 +68,89 @@ static void MX_I2C2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-  uint8_t buf[8];
+
+  uint8_t buf[8];// Buffer for Fast Write Command
+  static const uint8_t EXT_DAC_ADDR = 0b1100000 << 1; // Default address for MCP4728 DAC
+  static const uint8_t EXT_DAC_ADDR_UPDATE = 0x00; // General Call Commands address for MCP4728 DAC
+  static const uint8_t bufUpdate = 0x08;//General Call Software Update
+  static const uint8_t bufVRef = 0x80;//Select VRef Bit
+  void errorLight(HAL_StatusTypeDef HalStatus)
+  {
+    if (HalStatus != HAL_OK ) 
+    {
+      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);// Set LD1 HI
+      while(1){}
+    }
+  }
   void writeAllExtDac(float Vout)
   {
-    static const uint8_t EXT_DAC_ADDR = 0b1100000 << 1; // Use 8-bit address
-    static const uint8_t EXT_DAC_ADDR_UPDATE = 0x00; // Use 8-bit address
-    uint8_t bufUpdate = 0x08;
-    uint8_t bufVRef = 0x80;
     HAL_StatusTypeDef ret;
+    uint16_t DAC_VALUE = round(85.3125 * (24 - Vout));//((2^12 - 1) / 48) * (24 - Vout)
 
-    uint16_t DAC_VALUE = ((float)(4095) / (float)48) * (24 - Vout);
-
+    //Write DAC_Value into all 4 channels
     for(uint8_t i = 0;i < 8; i+=2)
     {
           buf[i] = (DAC_VALUE>>8) & 0x0F;
           buf[i+1] = DAC_VALUE;
-    }    
+    }
+    //Set VRef
     ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR, &bufVRef, 1, HAL_MAX_DELAY);
-    if ( ret != HAL_OK ) 
-    {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
-      while(1){}
-    }
-    ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR, &buf[0], 8, HAL_MAX_DELAY);
-    if ( ret != HAL_OK ) 
-    {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
-      while(1){}
-    }
-    ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR_UPDATE, &bufUpdate, 1, HAL_MAX_DELAY);
-    if ( ret != HAL_OK ) 
-    {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
-      while(1){}
-    }
-  }
+    errorLight(ret);
 
+    //Write Channel Registers
+    ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR, &buf[0], 8, HAL_MAX_DELAY);
+    errorLight(ret);
+
+    //Update Voltages
+    ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR_UPDATE, &bufUpdate, 1, HAL_MAX_DELAY);
+    errorLight(ret);
+  }
   void writeExtDac(uint8_t channel, float Vout)
   {
-    static const uint8_t EXT_DAC_ADDR = 0b1100000 << 1; // Use 8-bit address
-    static const uint8_t EXT_DAC_ADDR_UPDATE = 0x00; // Use 8-bit address
-    uint8_t bufUpdate = 0x08;
-    uint8_t bufVRef = 0x80;
     HAL_StatusTypeDef ret;
 
-    uint16_t DAC_VALUE = ((float)(4095) / (float)48) * (24 - Vout);
+    uint16_t DAC_VALUE = round(85.3125 * (24 - Vout));//((2^12 - 1) / 48) * (24 - Vout)
     buf[2*channel-2] = (DAC_VALUE>>8) & 0x0F;
     buf[2*channel-1] = DAC_VALUE;
         
+    //Set VRef
     ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR, &bufVRef, 1, HAL_MAX_DELAY);
-    if ( ret != HAL_OK ) 
-    {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
-      while(1){}
-    }
+    errorLight(ret);
+
+    //Write Channel Registers
     ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR, &buf[0], 8, HAL_MAX_DELAY);
-    if ( ret != HAL_OK ) 
-    {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
-      while(1){}
-    }
+    errorLight(ret);
+
+    //Update Voltages
     ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR_UPDATE, &bufUpdate, 1, HAL_MAX_DELAY);
-    if ( ret != HAL_OK ) 
-    {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
-      while(1){}
-    }
+    errorLight(ret);
   }
+
+
+  void setClkFreq(uint freq)
+  {
+    float VDac = .585-((freq-100000)*.585)/900000;
+    writeMcuDac(2, VDac);
+  }
+
+  void writeMcuDac(uint channel, float Vout)
+  {
+    if(channel == 1)
+    {
+      channel = DAC1_CHANNEL_1;
+    }
+    elseif(channel == 2)
+    {
+      channel = DAC1_CHANNEL_2;
+    }
+
+    uint16_t DAC_VALUE = round(Vout*4095/3.3);
+
+    //Write Channel Register
+    HAL_DAC_SetValue(&hdac1, channel, DAC_ALIGN_12B_R, DAC_VALUE);
+  }
+
+
 /* USER CODE END 0 */
 
 /**
@@ -172,9 +188,12 @@ int main(void)
   MX_I2C1_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
-  unsigned int num1 = 500, num2 = 1500;
-
-  /* USER CODE END 2 */ 
+  //writeAllExtDac(0);
+  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
+  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
+  unsigned int num1 = 0, num2 = 2048;
+  
+  /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -182,19 +201,31 @@ int main(void)
   {
     //HAL_GPIO_TogglePin(GPIOA, PA4_Pin);
     //HAL_GPIO_TogglePin(GPIOA, PA5_Pin);
-    num1 = 2048 > num1 ? num1 + 1 : 1500;
-    num2 = 2048 > num2 ? num2 + 1 : 1500;
+
+    //hdac1.Instance->DHR12R1 = num1;
+    //hdac1.Instance->DHR12R2 = num2;
     
-    hdac1.Instance->DHR12R1 = num1;
-    hdac1.Instance->DHR12R2 = num2;
     
+    HAL_GPIO_TogglePin(GPIOB, LD1_Pin);//Toggle LD1
+    HAL_GPIO_TogglePin(GPIOG, PG2_Pin);
+    HAL_GPIO_TogglePin(GPIOG, PG3_Pin);
+    HAL_GPIO_TogglePin(GPIOD, PD2_Pin);
+    HAL_GPIO_TogglePin(GPIOC, PC12_Pin);
+    HAL_Delay(3);
+    /*
     HAL_GPIO_TogglePin(GPIOB, LD1_Pin);
-    HAL_Delay(1000);
-    writeExtDac(1, -12);
-    writeExtDac(2, -3.3);
-    writeExtDac(3, 16);
-    writeExtDac(4, 22);
-    
+    HAL_GPIO_TogglePin(GPIOG, PG2_Pin);
+    HAL_GPIO_TogglePin(GPIOG, PG3_Pin);
+    HAL_GPIO_TogglePin(GPIOD, PD2_Pin);
+    HAL_Delay(100);
+    HAL_GPIO_TogglePin(GPIOB, LD1_Pin);
+    HAL_GPIO_TogglePin(GPIOG, PG2_Pin);
+    HAL_GPIO_TogglePin(GPIOG, PG3_Pin);
+    HAL_Delay(100);
+    HAL_GPIO_TogglePin(GPIOB, LD1_Pin);
+    HAL_GPIO_TogglePin(GPIOG, PG2_Pin);
+    HAL_Delay(100); */
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -297,7 +328,7 @@ static void MX_DAC1_Init(void)
   */
   sConfig.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
   sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
-  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
+  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
   sConfig.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
   sConfig.DAC_UserTrimming = DAC_TRIMMING_FACTORY;
   if (HAL_DAC_ConfigChannel(&hdac1, &sConfig, DAC_CHANNEL_1) != HAL_OK)
@@ -479,7 +510,13 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, GPIO_PIN_6, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, PG2_Pin|PG3_Pin|GPIO_PIN_6, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(PC12_GPIO_Port, PC12_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(PD2_GPIO_Port, PD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PC13 */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
@@ -518,8 +555,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PG6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_6;
+  /*Configure GPIO pins : PG2_Pin PG3_Pin PG6 */
+  GPIO_InitStruct.Pin = PG2_Pin|PG3_Pin|GPIO_PIN_6;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -530,6 +567,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PC12_Pin */
+  GPIO_InitStruct.Pin = PC12_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(PC12_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PD2_Pin */
+  GPIO_InitStruct.Pin = PD2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(PD2_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PG11 PG13 */
   GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_13;

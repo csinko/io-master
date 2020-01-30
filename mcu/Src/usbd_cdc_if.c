@@ -23,7 +23,7 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "main.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -265,6 +265,50 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  if(*Len != 2)
+  {
+    return USBD_OK;
+  }
+  if(Buf[0] == 'v')
+  {
+    switch(Buf[1])
+    {
+      case '0':
+      writeAllExtDac(0);
+      writeExtDac(1, 3.3);//3.3V
+      break;
+      case '1':
+      writeAllExtDac(0);
+      writeExtDac(1, 5);//5V
+      break;
+      case '2':
+      writeAllExtDac(0);
+      writeExtDac(1, 12);//12V
+      break;
+      case '3':
+      writeAllExtDac(0);
+      writeExtDac(1, 24);//24V
+      break;
+    }
+  }
+  else if(Buf[0] == 'f')
+  {
+    switch(Buf[1])
+    {
+      case '0':
+      //1kHz
+      break;
+      case '1':
+      //10kHz
+      break;
+      case '2':
+      //100kHz
+      break;
+      case '3':
+      //1MHz
+      break;
+    }
+  }
   return (USBD_OK);
   /* USER CODE END 6 */
 }

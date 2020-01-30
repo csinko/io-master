@@ -54,12 +54,21 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void writeAllExtDac(float Vout);
+void writeExtDac(uint8_t channel, float Vout);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define LD1_Pin GPIO_PIN_0
 #define LD1_GPIO_Port GPIOB
+#define PG2_Pin GPIO_PIN_2
+#define PG2_GPIO_Port GPIOG
+#define PG3_Pin GPIO_PIN_3
+#define PG3_GPIO_Port GPIOG
+#define PC12_Pin GPIO_PIN_12
+#define PC12_GPIO_Port GPIOC
+#define PD2_Pin GPIO_PIN_2
+#define PD2_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
