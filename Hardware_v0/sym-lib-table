@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name io-master)(type Legacy)(uri ${KIPRJMOD}/io-master.lib)(options "")(descr ""))
-)

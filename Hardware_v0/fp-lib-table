@@ -1,3 +1,0 @@
-(fp_lib_table
-  (lib (name io-master)(type KiCad)(uri ${KIPRJMOD}/io-master.pretty)(options "")(descr ""))
-)
