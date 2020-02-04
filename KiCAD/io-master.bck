@@ -1,0 +1,90 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 74AUP1T157
+D LOW POWER, 1.8/2.5/3.3-V INPUT, 3.3-V CMOS OUTPUT, SINGLE 2-INPUT
+$ENDCMP
+#
+$CMP ADA4522-4
+F https://www.analog.com/media/en/technical-documentation/data-sheets/ADA4522-1_4522-2_4522-4.pdf
+$ENDCMP
+#
+$CMP CHASSIS
+D Power symbol creates a global label with name "CHASSIS" , chassis ground
+K power-flag
+$ENDCMP
+#
+$CMP DG447DV
+D Low Power, High Voltage SPST Analog Switches, SPST-NC
+K CMOS Analog Switch
+F http://www.vishay.com/docs/73854/dg447.pdf
+$ENDCMP
+#
+$CMP DG448DV
+D Low Power, High Voltage SPST Analog Switches, SPST-NO
+K CMOS Analog Switch
+F http://www.vishay.com/docs/73854/dg447.pdf
+$ENDCMP
+#
+$CMP LM2621
+D Low Input Voltage, Step-Up DC-DC Converter
+$ENDCMP
+#
+$CMP LM7121IM5
+D 235-MHz Tiny Low Power Voltage Feedback Amplifier
+K single opamp
+F https://www.ti.com/lit/ds/symlink/lm7121.pdf
+$ENDCMP
+#
+$CMP LM7171
+D Very High Speed, High Output Current, Voltage Feedback Amplifier
+K single opamp
+F https://www.ti.com/lit/ds/symlink/lm7121.pdf
+$ENDCMP
+#
+$CMP MCP4725
+D 12-bit digital to analog converter, 2.048V internal reference, integrated EEPROM, I2C interface
+K dac i2c
+F http://ww1.microchip.com/downloads/en/DeviceDoc/22187E.pdf
+$ENDCMP
+#
+$CMP NCS20071
+D Operational Amplifier, Railto-Rail Output, 3 MHz BW
+K single opamp
+F https://www.onsemi.com/pub/Collateral/NCS20071-D.PDF
+$ENDCMP
+#
+$CMP NCV20074
+D Operational Amplifier, Railto-Rail Output, 3 MHz BW
+F https://www.onsemi.com/pub/Collateral/NCS20071-D.PDF
+$ENDCMP
+#
+$CMP PI5A3157
+D SOTinyTM Low Voltage Dual SPDT Analog Switch 2:1 Mux/DeMux Bus Switch
+K CMOS Analog Switch
+F https://www.diodes.com/assets/Datasheets/PI5A3157.pdf
+$ENDCMP
+#
+$CMP Q_DUAL_NMOS_DMN63D8LDW
+D Dual NMOS transistor, 6 pin package
+K transistor NMOS N-MOS N-MOSFET
+F https://www.diodes.com/assets/Datasheets/DMN63D8LDW.pdf
+$ENDCMP
+#
+$CMP Q_DUAL_PMOS_NMOS_DMG1029SV
+D Dual PMOS NMOS transistor, 6 pin package
+K transistor PMOS P-MOS P-MOSFET NMOS N-MOS N-MOSFET
+F https://www.diodes.com/assets/Datasheets/DMG1029SV.pdf
+$ENDCMP
+#
+$CMP Si8275xx-IS1
+D 4 Amp ISOdriver with High Transient (dV/dt) Immunity
+F https://www.silabs.com/documents/public/data-sheets/Si827x.pdf
+$ENDCMP
+#
+$CMP TS3011
+D Rail-to-rail high-speed comparator
+K single comparator
+F https://www.st.com/resource/en/datasheet/ts3011.pdf
+$ENDCMP
+#
+#End Doc Library
