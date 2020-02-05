@@ -5,7 +5,7 @@ $Descr B 17000 11000
 encoding utf-8
 Sheet 1 10
 Title "I/O MASTER v1"
-Date "2020-02-04"
+Date "2020-02-05"
 Rev "A"
 Comp "THE UNIVERSITY OF AKRON"
 Comment1 "DT18 - I/O MASTER"
@@ -82,7 +82,7 @@ F 3 "" H 2700 3150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2500 3100 2700 3100
+	2500 3100 2550 3100
 Wire Wire Line
 	2700 3100 2700 3150
 Text Notes 1900 4100 2    79   ~ 0
@@ -1484,17 +1484,24 @@ Wire Wire Line
 Connection ~ 3050 3450
 Wire Wire Line
 	3050 3450 3050 2700
+Text Notes 3900 1650 0    50   ~ 0
+INPUT: 4.6-15V
 $Comp
-L Connector:Jack-DC J1
-U 1 1 5DA50F70
+L Connector:Barrel_Jack_Switch J1
+U 1 1 5E3C0817
 P 2200 3000
 F 0 "J1" H 2200 3300 50  0000 C CNN
-F 1 "PJ-037A" H 2200 3200 50  0000 C CNN
-F 2 "" H 2250 2960 50  0001 C CNN
-F 3 "~" H 2250 2960 50  0001 C CNN
+F 1 "54-00166" H 2200 3200 50  0000 C CNN
+F 2 "io-master:BarrelJack_Tensility_54-00166_Horizontal" H 2250 2960 50  0001 C CNN
+F 3 "https://tensility.s3.amazonaws.com/uploads/pdffiles/54-00166.pdf?X-Amz-Expires=600&X-Amz-Date=20200205T184808Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIS2S4WRDQDSWDRZQ%2F20200205%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=cee2821c2b89355b72751d43bd97aff6d341b62e1b5ea29893536d159c2204cc" H 2250 2960 50  0001 C CNN
 	1    2200 3000
 	1    0    0    -1  
 $EndComp
-Text Notes 3900 1650 0    50   ~ 0
-INPUT: 4.6-15V
+Wire Wire Line
+	2500 3000 2550 3000
+Wire Wire Line
+	2550 3000 2550 3100
+Connection ~ 2550 3100
+Wire Wire Line
+	2550 3100 2700 3100
 $EndSCHEMATC
