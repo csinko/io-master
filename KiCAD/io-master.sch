@@ -5,7 +5,7 @@ $Descr B 17000 11000
 encoding utf-8
 Sheet 1 10
 Title "I/O MASTER v1"
-Date "2020-02-05"
+Date "2020-02-07"
 Rev "A"
 Comp "THE UNIVERSITY OF AKRON"
 Comment1 "DT18 - I/O MASTER"
@@ -393,7 +393,7 @@ Wire Wire Line
 Wire Wire Line
 	6700 1250 3850 1250
 Wire Wire Line
-	2550 1250 2550 1850
+	2550 1250 2550 1400
 Wire Wire Line
 	3850 1800 3850 1250
 Connection ~ 3850 1250
@@ -1008,7 +1008,7 @@ Wire Wire Line
 Wire Wire Line
 	13850 6300 13950 6300
 Wire Wire Line
-	13850 4850 13850 6300
+	13850 4850 13850 5100
 Wire Wire Line
 	15150 4000 15350 4000
 $Comp
@@ -1504,4 +1504,30 @@ Wire Wire Line
 Connection ~ 2550 3100
 Wire Wire Line
 	2550 3100 2700 3100
+Wire Wire Line
+	13850 5400 13850 6300
+Wire Wire Line
+	2550 1700 2550 1850
+$Comp
+L Device:Polyfuse F1
+U 1 1 5E3F0B3D
+P 2550 1550
+F 0 "F1" H 2638 1596 50  0000 L CNN
+F 1 "0.5A" H 2638 1505 50  0000 L CNN
+F 2 "Fuse:Fuse_1206_3216Metric" H 2600 1350 50  0001 L CNN
+F 3 "~" H 2550 1550 50  0001 C CNN
+	1    2550 1550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:Polyfuse F2
+U 1 1 5E3F2C3B
+P 13850 5250
+F 0 "F2" H 13938 5296 50  0000 L CNN
+F 1 "0.1A" H 13938 5205 50  0000 L CNN
+F 2 "Fuse:Fuse_1206_3216Metric" H 13900 5050 50  0001 L CNN
+F 3 "~" H 13850 5250 50  0001 C CNN
+	1    13850 5250
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
