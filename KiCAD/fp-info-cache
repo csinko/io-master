@@ -1,4 +1,4 @@
-16926110854454630
+16927692135163630
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -75249,6 +75249,13 @@ Logo OSHW
 0
 0
 0
+io-master
+PinSocket_2x05_P2.54mm_Vertical_AltNumbering
+Through hole straight socket strip, 2x05, 2.54mm pitch, double cols (from Kicad 4.0.7), script generated
+Through hole socket strip THT 2x05 2.54mm double row
+0
+10
+10
 io-master
 SW_DPDT_CK_JS202011SCQN
 
