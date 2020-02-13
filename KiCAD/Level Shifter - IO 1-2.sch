@@ -5,7 +5,7 @@ $Descr B 17000 11000
 encoding utf-8
 Sheet 4 10
 Title "LEVEL SHIFTER SUBSYSTEM - I/O PINS 1 & 2"
-Date "2020-02-10"
+Date "2020-02-13"
 Rev "A"
 Comp "THE UNIVERSITY OF AKRON"
 Comment1 "DT18 - I/O MASTER"

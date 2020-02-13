@@ -5,7 +5,7 @@ $Descr B 17000 11000
 encoding utf-8
 Sheet 3 10
 Title "3.3-15V ADJUSTABLE REGULATOR"
-Date "2020-02-10"
+Date "2020-02-13"
 Rev "A"
 Comp "THE UNIVERSITY OF AKRON"
 Comment1 "DT18 - I/O MASTER"

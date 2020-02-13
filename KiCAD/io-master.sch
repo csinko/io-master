@@ -4,8 +4,8 @@ EELAYER END
 $Descr B 17000 11000
 encoding utf-8
 Sheet 1 10
-Title "I/O MASTER v1"
-Date "2020-02-10"
+Title "I/O MASTER v1.0"
+Date "2020-02-13"
 Rev "A"
 Comp "THE UNIVERSITY OF AKRON"
 Comment1 "DT18 - I/O MASTER"
