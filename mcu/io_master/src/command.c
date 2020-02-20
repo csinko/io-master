@@ -165,8 +165,9 @@ void getPinParams(uint8_t pinNum, uint8_t* comm)
 
 void getTargetDeviceVolt(uint8_t* comm)
 {
-    uint16_t Volt;
-
+    //device volt is on Dac channel 1
+    // last 12 bits are the channel 1 output
+    uint16_t Volt = HAL_DAC_GetValue(&hdac1, DAC1_CHANNEL_1); // & 0x00000FFF
     return;
 }
 
@@ -184,10 +185,3 @@ void getDataSpeed(uint8_t* comm)
     return;
 }
 
-void getPinParams(uint8_t* comm)
-{
-    comm[1] = comm[1] & resState;
-    comm[2] = 
-
-    return;
-}
