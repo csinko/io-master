@@ -37,7 +37,6 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Src/main.c \
-Src/usb_device.c \
 Src/usbd_conf.c \
 Src/usbd_desc.c \
 Src/stm32h7xx_it.c \
@@ -73,7 +72,12 @@ Src/usbd_cdc_if.c \
 Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c \
 io_master/src/data.c \
 io_master/src/iopin.c \
-io_master/mcu/stm32h743/src/io_dma.c
+io_master/mcu/stm32h743/src/clock.c \
+io_master/mcu/stm32h743/src/dac.c \
+io_master/mcu/stm32h743/src/gpio.c \
+io_master/mcu/stm32h743/src/io_dma.c \
+io_master/mcu/stm32h743/src/timer.c \
+io_master/mcu/stm32h743/src/usb.c
 
 # ASM sources
 ASM_SOURCES =  \

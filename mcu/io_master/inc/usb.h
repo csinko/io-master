@@ -5,8 +5,11 @@ extern "C" {
 #endif
 
 #include "core.h"
+#include "usbd_def.h"
 
-IOM_ERROR InitUSB();
+USBD_HandleTypeDef hUsbDeviceFS;
+
+IOM_ERROR InitUSB(void);
 
 #ifdef __cplusplus
 }

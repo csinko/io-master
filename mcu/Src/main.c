@@ -23,6 +23,9 @@
 #include "core.h"
 #include "clock.h"
 #include "gpio.h"
+#include "io_dma.h"
+#include "timer.h"
+#include "usb.h"
 
 #if defined( __ICCARM__ )
   #define DMA_BUFFER \
@@ -50,7 +53,7 @@ int main(void)
   HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
   unsigned int num1 = 0, num2 = 2048;
   
-  MX_USB_DEVICE_Init();
+  InitUSB();
   InitTimers();
   InitDMA();
   GPIOF->ODR = 0xFFFF;

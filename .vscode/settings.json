@@ -10,6 +10,7 @@
         "stm32h743xx.h": "c",
         "iopin.h": "c",
         "data.h": "c",
-        "clock.h": "c"
+        "clock.h": "c",
+        "usb.h": "c"
     }
 }
