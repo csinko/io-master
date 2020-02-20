@@ -17,7 +17,6 @@
   */
 
 #include "main.h"
-#include "usb_device.h"
 #include "iopin.h"
 #include "data.h"
 #include "core.h"
@@ -26,6 +25,7 @@
 #include "io_dma.h"
 #include "timer.h"
 #include "usb.h"
+#include "dac.h"
 
 #if defined( __ICCARM__ )
   #define DMA_BUFFER \
@@ -38,8 +38,6 @@
 DMA_HandleTypeDef hdma_dma_generator0;
 uint8_t DMABusyFlag = 0;
 
-DAC_HandleTypeDef hdac1;
-static void MX_DAC1_Init(void);
 
 
 int main(void)
@@ -48,12 +46,16 @@ int main(void)
 
   InitSystemClock();
   InitGPIO();
-  MX_DAC1_Init();
+  InitDAC();
   HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
   HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
   unsigned int num1 = 0, num2 = 2048;
   
+<<<<<<< HEAD
   InitUSB();
+=======
+  MX_USB_DEVICE_Init();
+>>>>>>> d7eb64f12b92b55fd141e6f82ebe27727dc2d393
   InitTimers();
   InitDMA();
   GPIOF->ODR = 0xFFFF;
@@ -76,6 +78,7 @@ int main(void)
 
 
 
+<<<<<<< HEAD
 /**
   * @brief DAC1 Initialization Function
   * @param None
@@ -116,6 +119,8 @@ static void MX_DAC1_Init(void)
   /* USER CODE END DAC1_Init 2 */
 
 }
+=======
+>>>>>>> d7eb64f12b92b55fd141e6f82ebe27727dc2d393
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if(GPIO_Pin == USER_Btn_Pin) {
