@@ -51,11 +51,7 @@ int main(void)
   HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
   unsigned int num1 = 0, num2 = 2048;
   
-<<<<<<< HEAD
   InitUSB();
-=======
-  MX_USB_DEVICE_Init();
->>>>>>> d7eb64f12b92b55fd141e6f82ebe27727dc2d393
   InitTimers();
   InitDMA();
   GPIOF->ODR = 0xFFFF;
@@ -78,49 +74,6 @@ int main(void)
 
 
 
-<<<<<<< HEAD
-/**
-  * @brief DAC1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_DAC1_Init(void)
-{
-
-  /* USER CODE BEGIN DAC1_Init 0 */
-
-  /* USER CODE END DAC1_Init 0 */
-
-  DAC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN DAC1_Init 1 */
-
-  /* USER CODE END DAC1_Init 1 */
-  /** DAC Initialization 
-  */
-  hdac1.Instance = DAC1;
-  if (HAL_DAC_Init(&hdac1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** DAC channel OUT1 config 
-  */
-  sConfig.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
-  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
-  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-  sConfig.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
-  sConfig.DAC_UserTrimming = DAC_TRIMMING_FACTORY;
-  if (HAL_DAC_ConfigChannel(&hdac1, &sConfig, DAC_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN DAC1_Init 2 */
-
-  /* USER CODE END DAC1_Init 2 */
-
-}
-=======
->>>>>>> d7eb64f12b92b55fd141e6f82ebe27727dc2d393
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if(GPIO_Pin == USER_Btn_Pin) {
