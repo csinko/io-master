@@ -52,8 +52,8 @@ int main(void)
   unsigned int num1 = 0, num2 = 2048;
   
   MX_USB_DEVICE_Init();
-  MX_TIM8_Init();
-  MX_DMA_Init();
+  InitTimers();
+  InitDMA();
   GPIOF->ODR = 0xFFFF;
   while (1)
   {
@@ -73,116 +73,6 @@ int main(void)
 }
 
 
-void SystemClock_Config(void)
-{
-}
-
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-
-}
-
-static void MX_TIM8_Init(void)
-{
-
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_OC_InitTypeDef sConfigOC = {0};
-  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
-
-  htim8.Instance = TIM8;
-  TIM8->BDTR |= TIM_BDTR_MOE;
-  htim8.Init.Prescaler = 0;
-  htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim8.Init.Period = 1;
-  htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim8.Init.RepetitionCounter = 0;
-  htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_PWM_Init(&htim8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-TIM8->BDTR |= TIM_BDTR_MOE;
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig); 
-
-
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 1;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
-  sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigOC.Pulse = 1;
-  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigOC.Pulse = 1;
-  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  TIM8->BDTR |= TIM_BDTR_MOE;
-
-  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
-  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-  sBreakDeadTimeConfig.DeadTime = 0;
-  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_ENABLE;
-  HAL_TIMEx_ConfigBreakDeadTime(&htim8, &sBreakDeadTimeConfig);
-
-  HAL_TIM_MspPostInit(&htim8);
-  TIM8->BDTR |= TIM_BDTR_MOE;
-
-  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1) != HAL_OK) {
-    Error_Handler();
-  }
-  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3) != HAL_OK) {
-    Error_Handler();
-  }
-  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_4) != HAL_OK) {
-    Error_Handler();
-  }
-TIM8->BDTR |= TIM_BDTR_MOE;
-}
-
-static void MX_DMA_Init(void) 
-{
-  __HAL_RCC_DMA2_CLK_ENABLE();
-
-  hdma_dma_generator0.Instance = DMA2_Stream7;
-  hdma_dma_generator0.Init.Request = DMA_REQUEST_TIM8_CH4;
-  hdma_dma_generator0.Init.Direction = DMA_MEMORY_TO_PERIPH;
-  hdma_dma_generator0.Init.PeriphInc = DMA_PINC_DISABLE;
-  hdma_dma_generator0.Init.MemInc = DMA_MINC_ENABLE;
-  hdma_dma_generator0.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-  hdma_dma_generator0.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-  hdma_dma_generator0.Init.Mode = DMA_NORMAL;
-  hdma_dma_generator0.Init.Priority = DMA_PRIORITY_VERY_HIGH;
-  hdma_dma_generator0.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
-  hdma_dma_generator0.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_1QUARTERFULL;
-  hdma_dma_generator0.Init.MemBurst = DMA_MBURST_SINGLE;
-  hdma_dma_generator0.Init.PeriphBurst = DMA_PBURST_SINGLE;
-__HAL_LINKDMA(&htim8, hdma[TIM_DMA_ID_CC4], hdma_dma_generator0);
-  HAL_DMA_Init(htim8.hdma[TIM_DMA_ID_CC4]);
-  HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
-}
 
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
@@ -194,10 +84,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 
 
-
-void Error_Handler(void)
-{
-}
 
 #ifdef  USE_FULL_ASSERT
 /**
