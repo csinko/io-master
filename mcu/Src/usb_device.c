@@ -1,7 +1,8 @@
 /**
   ******************************************************************************
-  * @file    stm32h7xx_it.c
-  * @brief   Interrupt Service Routines.
+  * @file           : usb_device.c
+  * @version        : v1.0_Cube
+  * @brief          : This file implements the USB Device
   ******************************************************************************
   * @attention
   *
@@ -15,66 +16,32 @@
   *
   ******************************************************************************
   */
-#include "main.h"
-#include "stm32h7xx_it.h"
-extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+#include "usb_device.h"
+#include "usbd_core.h"
+#include "usbd_desc.h"
+#include "usbd_cdc.h"
+#include "usbd_cdc_if.h"
 
-void NMI_Handler(void)
-{
-}
+USBD_HandleTypeDef hUsbDeviceFS;
 
-void HardFault_Handler(void)
+void MX_USB_DEVICE_Init(void)
 {
-  while (1)
+  if (USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS) != USBD_OK)
   {
+    Error_Handler();
   }
-}
-
-void MemManage_Handler(void)
-{
-  while (1)
+  if (USBD_RegisterClass(&hUsbDeviceFS, &USBD_CDC) != USBD_OK)
   {
+    Error_Handler();
   }
-}
-
-void BusFault_Handler(void)
-{
-  while (1)
+  if (USBD_CDC_RegisterInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS) != USBD_OK)
   {
+    Error_Handler();
   }
-}
-
-void UsageFault_Handler(void)
-{
-  while (1)
+  if (USBD_Start(&hUsbDeviceFS) != USBD_OK)
   {
+    Error_Handler();
   }
-}
-
-void SVC_Handler(void)
-{
-}
-
-void DebugMon_Handler(void)
-{
-}
-
-void PendSV_Handler(void)
-{
-}
-
-void SysTick_Handler(void)
-{
-  HAL_IncTick();
-}
-
-void EXTI15_10_IRQHandler(void)
-{
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
-}
-
-void OTG_FS_IRQHandler(void)
-{
-  HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
+  HAL_PWREx_EnableUSBVoltageDetector();
 }
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

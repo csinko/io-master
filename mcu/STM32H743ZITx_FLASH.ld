@@ -188,6 +188,11 @@ SECTIONS
   }
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
+
+  .dma_buffer :
+  {
+    *(.dma_buffer)
+  } >RAM_D2
 }
 
 
