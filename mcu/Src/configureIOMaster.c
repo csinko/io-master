@@ -9,14 +9,6 @@
   
   uint8_t Hbuf[8];//Buffer for Fast Write Command to VH DAC  
   uint8_t Lbuf[8];//Buffer for Fast Write Command to VL DAC
-  uint8_t resState;
-
-  enum resistorState
-  {
-      pullDown = 0,
-      pullUp,
-      terminator,
-  }
 
   void errorLight(HAL_StatusTypeDef HalStatus)
   {
@@ -26,10 +18,11 @@
       while(1){}
     }
   }
+  //TESTING
   void writeAllExtDac(float Vout)
   {
     HAL_StatusTypeDef ret;
-    uint16_t DAC_VALUE = round(85.3125 * (24 - Vout));//((2^12 - 1) / 48) * (24 - Vout)
+    uint16_t DAC_VALUE = round(136.5 * (15 - Vout));//((2^12 - 1) / 30) * (15 - Vout)
 
     //Write DAC_Value into all 4 channels
     for(uint8_t i = 0;i < 8; i+=2)
@@ -49,11 +42,12 @@
     ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR_UPDATE, &bufUpdate, 1, HAL_MAX_DELAY);
     errorLight(ret);
   }
+  //TESTING
   void writeExtDac(uint8_t channel, float Vout)
   {
     HAL_StatusTypeDef ret;
 
-    uint16_t DAC_VALUE = round(85.3125 * (24 - Vout));//((2^12 - 1) / 48) * (24 - Vout)
+    uint16_t DAC_VALUE = round(136.5 * (15 - Vout));//((2^12 - 1) / 30) * (15 - Vout)
     buf[2*channel-2] = (DAC_VALUE>>8) & 0x0F;
     buf[2*channel-1] = DAC_VALUE;
         
@@ -90,13 +84,20 @@
     ret = HAL_I2C_Master_Transmit(&hi2c2, EXT_DAC_ADDR_UPDATE, &bufUpdate, 1, HAL_MAX_DELAY);
     errorLight(ret);
   }
-
-  void setClkFreq(uint freq)
+  
+  uint8_t readExtDac(bool isVH, bool isUpper, uint8_t channel)
   {
-    float VDac = .585-((freq-100000)*.585)/900000;
-    writeMcuDac(2, VDac);
+    uint8_t *buf = isVH ? &Hbuf : &Lbuf;
+
+    if(isUpper)
+    {
+      return buf[2*channel-1];
+    }
+    //else not Upper
+    return buf[2*channel-2];
   }
 
+  //TESTING
   void writeMcuDac(uint channel, float Vout)
   {
     if(channel == 1)
@@ -114,5 +115,22 @@
     HAL_DAC_SetValue(&hdac1, channel, DAC_ALIGN_12B_R, DAC_VALUE);
   }
 
+  //channel: expects 1 or 2
+  //dacVal: expects the 12-bit bitpattern scaled for 3.3V Max
+  void writeMcuDac(uint channel, uint16_t dacVal)
+  {
+    if(channel == 1)
+    {
+      channel = DAC1_CHANNEL_1;
+    }
+    elseif(channel == 2)
+    {
+      //currently only using channel 1
+      channel = DAC1_CHANNEL_2;
+    }
+
+    //Write Channel Register
+    HAL_DAC_SetValue(&hdac1, channel, DAC_ALIGN_12B_R, dacVal);
+  }
   
 
