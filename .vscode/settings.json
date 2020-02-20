@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "main.h": "c",
+        "core.h": "c",
+        "stm32h7xx_hal.h": "c",
+        "stm32h7xx_hal_conf.h": "c",
+        "stm32h7xx_hal_rcc.h": "c",
+        "stm32h7xx_hal_def.h": "c",
+        "stm32h7xx.h": "c",
+        "stm32h743xx.h": "c",
+        "iopin.h": "c",
+        "data.h": "c",
+        "clock.h": "c",
+        "usb.h": "c"
+    }
+}

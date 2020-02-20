@@ -1,0 +1,45 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        },
+        {
+            "name": "IO Master",
+            "includePath": [
+                "${workspaceFolder}/mcu/Inc",
+                "${workspaceFolder}/mcu/Drivers/STM32H7xx_HAL_Driver/Inc",
+                "${workspaceFolder}/mcu/Drivers/STm32H7xx_HAL_Driver/Inc/Legacy",
+                "${workspaceFolder}/mcu/Middlewares/ST/STM32_USB_Device_Library/Core/Inc",
+                "${workspaceFolder}/mcu/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
+                "${workspaceFolder}/mcu/Drivers/CMSIS/Include",
+                "${workspaceFolder}/mcu/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc",
+                "${workspaceFolder}/mcu/io_master/mcu/stm32h743/inc",
+                "${workspaceFolder}/mcu/io_master/inc",
+                "/usr/lib/gcc/arm-none-eabi/9.2.0/include",
+                "/usr/lib/gcc/arm-none-eabi/9.2.0/include-fixed"
+            ],
+            "defines": [
+                "USE_HAL_DRIVER",
+                "STM32H743xx"
+            ],
+            "intelliSenseMode": "gcc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "usr/lib/gcc/arm-none-eabi/9.2.0"
+                ],
+                "limitSymbolsToIncludedHeaders": false,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 4
+}

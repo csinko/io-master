@@ -1,0 +1,8 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP DG449
+D High Voltage Single SPDT Analog Switch in SOT23-8
+F http://www.vishay.com/docs/73897/dg449.pdf
+$ENDCMP
+#
+#End Doc Library

@@ -1,3 +1,0 @@
-(fp_lib_table
-  (lib (name io_master)(type KiCad)(uri /home/ian/Projects/io-master/io_master.pretty)(options "")(descr ""))
-)
