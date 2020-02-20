@@ -7,3 +7,9 @@ void StartDMATransfer(IOM_Output_Buffer* pBuffer) {
   __HAL_TIM_ENABLE_DMA(&htim8, TIM_DMA_CC4);
 }
 
+void ResetDMA() {
+  HAL_DMA_Abort((htim8.hdma[TIM_DMA_ID_CC4]));
+  HAL_DMA_DeInit((htim8.hdma[TIM_DMA_ID_CC4]));
+  HAL_DMA_Init((htim8.hdma[TIM_DMA_ID_CC4]));
+}
+
