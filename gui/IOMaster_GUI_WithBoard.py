@@ -13,7 +13,7 @@ window = TK.Tk()
 window.title("IO Master Setup")
 window.geometry("500x300")
 
-ser = serial.Serial(port='/dev/ttyACM1', baudrate=115200)
+ser = serial.Serial(port='COM5', baudrate=115200)
 
 def read_from_port(ser):
     while True:
@@ -102,12 +102,6 @@ class Button:
 
             sendCommand(dataToSend)        #send command to the board
 
-#Character Input Validation
-def only_numbers(char):
-    return char.isdigit()
-
-validation = window.register(only_numbers)
-entry = TK.Entry(window, validate="key", validatecommand=(validation, '%S'))
 
 #declare Visual Components        
 lbl0 = Label(window, "Protocol", 0, 0)
