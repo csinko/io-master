@@ -13,7 +13,6 @@ extern "C" {
 // @return IOM_OK if ok, an IOM_ERROR if there
 // are any issues 
 //
-
 IOM_ERROR InitSystemClock(void);
 
 #ifdef __cplusplus

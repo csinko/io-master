@@ -46,4 +46,6 @@ IOM_ERROR InitSystemClock(void) {
   {
     Error_Handler();
   }
+
+  return IOM_OK;
 }
