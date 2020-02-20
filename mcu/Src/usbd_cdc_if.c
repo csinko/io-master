@@ -21,6 +21,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
+#include "main.h"
 
 /* USER CODE BEGIN INCLUDE */
 
@@ -265,22 +266,20 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-  static uint32_t i;
-  //Loop through the received message
-  for(i = 0; i < *Len; i++) {
-    if (Buf[i] == '1') {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_RESET);
-    } else if (Buf[i] == '2') {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_SET);
-    } else if (Buf[i] == '0') {
-      HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_RESET);
+  if (Buf[0] == 's') {
+    if (*Len != 10) {
+      //Something is not right, return
+      return (USBD_OK);
     }
-  }
+  //Convert the output to a uint8_t
+  uint8_t output = (uint8_t) strtol((char*)(Buf+1), NULL, 2); 
+  QueueOutputDataToSend(output, 1, 1);
+  uint8_t response = (uint8_t) 'z';
+  CDC_Transmit_FS(&response, 1);
   return (USBD_OK);
+  }
   /* USER CODE END 6 */
+  return (USBD_OK);
 }
 
 /**

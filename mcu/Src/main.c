@@ -1,7 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.c
+  * @file           : (main.c
   * @brief          : Main program body
   ******************************************************************************
   * @attention
@@ -21,6 +21,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
+#include "iopin.h"
+#include "data.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -51,9 +53,11 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-TIM_HandleTypeDef htim8;
 
 DMA_HandleTypeDef hdma_dma_generator0;
+
+uint8_t DMABusyFlag = 0;
+
 /* USER CODE BEGIN PV */
 
 
@@ -64,36 +68,20 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_TIM8_Init(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-DMA_BUFFER uint16_t output_buf[256];
-
-void transmit_error_handler() {
-  while(1) {
-    for (int i = 0; i < 3; i++) {
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_SET);
-    HAL_Delay(100);
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_RESET);
-    HAL_Delay(100);
-    }
-    HAL_Delay(500);
-  }
-}
-
-void data_transmitted_handler() {
-  HAL_GPIO_WritePin(GPIOB, LD3_Pin, GPIO_PIN_SET);
-}
-
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
+
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -121,26 +109,39 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_TIM8_Init();
   MX_DMA_Init();
+
   /* USER CODE BEGIN 2 */
+  //Set the GPIOF pins high
+  GPIOF->ODR = 0xFFFF;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  for (int i = 0; i < 256; i++) {
-    output_buf[i] = 0xFFFF;
-  }
+
   while (1)
   {
-    HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_SET);
-    HAL_Delay(100);
-    HAL_GPIO_WritePin(GPIOB, LD1_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
+
+    //If the output queue is not empty and the DMA is not busy
+    uint32_t counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
+    if ((output_buf_queue_size > 0) && (counter == 0)) {
+      if (DMABusyFlag != 0) {
+        HAL_DMA_Abort((htim8.hdma[TIM_DMA_ID_CC4]));
+        HAL_DMA_DeInit((htim8.hdma[TIM_DMA_ID_CC4]));
+        HAL_DMA_Init((htim8.hdma[TIM_DMA_ID_CC4]));
+        DMABusyFlag = 0;
+      }
+      DMABusyFlag = 1;
+      SendOutputData();
+      //Send the front of the output queue over DMA
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
+
 
 /**
   * @brief System Clock Configuration
@@ -185,7 +186,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
                               |RCC_CLOCKTYPE_D3PCLK1|RCC_CLOCKTYPE_D1PCLK1;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV1;
@@ -218,6 +219,7 @@ static void MX_TIM8_Init(void)
 
   /* USER CODE BEGIN TIM8_Init 0 */
 
+
   /* USER CODE END TIM8_Init 0 */
 
   TIM_MasterConfigTypeDef sMasterConfig = {0};
@@ -228,9 +230,10 @@ static void MX_TIM8_Init(void)
 
   /* USER CODE END TIM8_Init 1 */
   htim8.Instance = TIM8;
-  htim8.Init.Prescaler = 1;
+  TIM8->BDTR |= TIM_BDTR_MOE;
+  htim8.Init.Prescaler = 0;
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim8.Init.Period = 1250;
+  htim8.Init.Period = 1;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim8.Init.RepetitionCounter = 0;
   htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -238,9 +241,14 @@ static void MX_TIM8_Init(void)
   {
     Error_Handler();
   }
+TIM8->BDTR |= TIM_BDTR_MOE;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig); 
+
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 250;
+  sConfigOC.Pulse = 1;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -250,17 +258,34 @@ static void MX_TIM8_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 600;
+  sConfigOC.Pulse = 1;
   if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 670;
+  sConfigOC.Pulse = 1;
   if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();
   }
+TIM8->BDTR |= TIM_BDTR_MOE;
   /* USER CODE BEGIN TIM8_Init 2 */
+
+  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
+  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
+  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
+  sBreakDeadTimeConfig.DeadTime = 0;
+  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
+  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
+  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_ENABLE;
+  HAL_TIMEx_ConfigBreakDeadTime(&htim8, &sBreakDeadTimeConfig);
+
+  HAL_TIM_MspPostInit(&htim8);
+  TIM8->BDTR |= TIM_BDTR_MOE;
+
+
+
+
 
   if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1) != HAL_OK) {
     Error_Handler();
@@ -271,11 +296,9 @@ static void MX_TIM8_Init(void)
   if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_4) != HAL_OK) {
     Error_Handler();
   }
+TIM8->BDTR |= TIM_BDTR_MOE;
 
-  htim8.hdma[TIM_DMA_ID_CC4]->XferCpltCallback = data_transmitted_handler;
-  htim8.hdma[TIM_DMA_ID_CC4]->XferErrorCallback = transmit_error_handler;
   /* USER CODE END TIM8_Init 2 */
-  HAL_TIM_MspPostInit(&htim8);
 
 }
 
@@ -297,7 +320,6 @@ static void MX_DMA_Init(void)
   //#define DMA_REQUEST_TIM8_COM         53U  /*!< DMAMUX1 TIM8 COM request  */
   //
   /* Local variables */
-  HAL_DMA_MuxSyncConfigTypeDef pSyncConfig = {0};
 
   /* DMA controller clock enable */
   __HAL_RCC_DMA2_CLK_ENABLE();
@@ -308,18 +330,18 @@ static void MX_DMA_Init(void)
   hdma_dma_generator0.Init.Request = DMA_REQUEST_TIM8_CH4;
   hdma_dma_generator0.Init.Direction = DMA_MEMORY_TO_PERIPH;
   hdma_dma_generator0.Init.PeriphInc = DMA_PINC_DISABLE;
-  hdma_dma_generator0.Init.MemInc = DMA_MINC_DISABLE;
-  hdma_dma_generator0.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-  hdma_dma_generator0.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+  hdma_dma_generator0.Init.MemInc = DMA_MINC_ENABLE;
+  hdma_dma_generator0.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+  hdma_dma_generator0.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
   hdma_dma_generator0.Init.Mode = DMA_NORMAL;
   hdma_dma_generator0.Init.Priority = DMA_PRIORITY_VERY_HIGH;
   hdma_dma_generator0.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
   hdma_dma_generator0.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_1QUARTERFULL;
   hdma_dma_generator0.Init.MemBurst = DMA_MBURST_SINGLE;
   hdma_dma_generator0.Init.PeriphBurst = DMA_PBURST_SINGLE;
-  __HAL_LINKDMA(&htim8, hdma[TIM_DMA_ID_CC4], hdma_dma_generator0);
+__HAL_LINKDMA(&htim8, hdma[TIM_DMA_ID_CC4], hdma_dma_generator0);
   HAL_DMA_Init(htim8.hdma[TIM_DMA_ID_CC4]);
-  HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 1, 1);
+  HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 
   /* Configure the DMAMUX synchronization parameters for the selected DMA stream */
@@ -445,11 +467,17 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if(GPIO_Pin == USER_Btn_Pin) {
-      SCB_CleanDCache_by_Addr(&output_buf, 256);
-      HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)&output_buf, (uint32_t)(&GPIOF->ODR), 256);
-      __HAL_TIM_ENABLE_DMA(&htim8, TIM_DMA_CC4);
-
+      //Queue the data to be sent
+      uint8_t dataToSend = 0b10111111;
+      QueueOutputDataToSend(&dataToSend, 1, 1);
     }
+}
+
+// Prepares data to be sent
+// @param data: pointer to the data to send
+// @param length the length of the data to send
+void PrepareData(uint8_t* data, size_t length) {
+
 }
 
 

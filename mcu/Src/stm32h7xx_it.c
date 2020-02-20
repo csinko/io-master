@@ -226,6 +226,14 @@ void OTG_FS_IRQHandler(void)
   /* USER CODE END OTG_FS_IRQn 1 */
 }
 
+void DMA2_Stream7_IRQHandler(void) {
+  HAL_DMA_Abort_IT((htim8.hdma[TIM_DMA_ID_CC4]));
+  HAL_DMA_DeInit((htim8.hdma[TIM_DMA_ID_CC4]));
+  HAL_DMA_Init((htim8.hdma[TIM_DMA_ID_CC4]));
+  //initDMA();
+  //htim8.hdma[TIM_DMA_ID_CC4]->State = HAL_DMA_STATE_READY;
+}
+
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
