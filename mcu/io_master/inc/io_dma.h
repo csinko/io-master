@@ -7,6 +7,8 @@ extern "C" {
 
 #include "core.h"
 
+
+IOM_ERROR InitDMA(void);
 void StartDMATransfer(IOM_Output_Buffer* pBuffer);
 void ResetDMA();
 

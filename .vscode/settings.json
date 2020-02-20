@@ -9,6 +9,7 @@
         "stm32h7xx.h": "c",
         "stm32h743xx.h": "c",
         "iopin.h": "c",
-        "data.h": "c"
+        "data.h": "c",
+        "clock.h": "c"
     }
 }
