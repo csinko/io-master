@@ -11,6 +11,7 @@
         "iopin.h": "c",
         "data.h": "c",
         "clock.h": "c",
-        "usb.h": "c"
+        "usb.h": "c",
+        "timer.h": "c"
     }
 }

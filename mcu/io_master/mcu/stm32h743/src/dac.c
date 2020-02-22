@@ -1,4 +1,5 @@
   #include "dac.h"
+  #include "stm32h743xx.h"
   #include "stm32h7xx_hal.h"
   #include "stm32h7xx_hal_dac.h"
 

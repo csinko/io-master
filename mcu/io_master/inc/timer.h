@@ -6,6 +6,8 @@ extern "C" {
 
 #include "core.h"
 
+TIM_HandleTypeDef htim8;
+
 IOM_ERROR InitTimers(void);
 
 #ifdef __cplusplus

@@ -1,4 +1,5 @@
 #include "timer.h"
+#include "stm32h743xx.h"
 #include "stm32h7xx_hal.h"
 
 IOM_ERROR InitTimers(void) {
@@ -18,7 +19,7 @@ IOM_ERROR InitTimers(void) {
   {
     Error_Handler();
   }
-TIM8->BDTR |= TIM_BDTR_MOE;
+  TIM8->BDTR |= TIM_BDTR_MOE;
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig); 

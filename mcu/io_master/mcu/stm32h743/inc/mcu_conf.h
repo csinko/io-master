@@ -306,7 +306,6 @@ extern "C" {
 #define TDO_SWO_GPIO_Port GPIOB
 #define TDO_SWO_Pin GPIO_PIN_3
 
-//Reset Pin
 #define nRESET_GPIO_Port GPIOB
 #define nRESET_Pin GPIO_PIN_4
 

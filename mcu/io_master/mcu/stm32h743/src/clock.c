@@ -1,5 +1,10 @@
 #include "clock.h"
+#include <stdint.h>
+#include <unistd.h>
 #include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal_pwr_ex.h"
+#include "stm32h7xx_hal_pwr.h"
+#include "stm32h743xx.h"
 
 IOM_ERROR InitSystemClock(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};

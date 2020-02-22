@@ -22,8 +22,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx.h"
 #include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal_pcd.h"
 #include "usbd_def.h"
 #include "usbd_core.h"
+#include "usb.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -159,9 +161,7 @@ static void PCD_DataOutStageCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
 {
-  USBD_LL_DataOutStage((USBD_HandleTypeDef*)hpcd->pData, epnum, hpcd->OUT_ep[epnum].xfer_buff);
-}
-
+  USBD_LL_DataOutStage((USBD_HandleTypeDef*)WO Decoding 
 /**
   * @brief  Data In stage callback.
   * @param  hpcd: PCD handle
