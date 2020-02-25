@@ -24,7 +24,6 @@
 #include "gpio.h"
 #include "io_dma.h"
 #include "timer.h"
-#include "usb.h"
 #include "dac.h"
 #include "stm32h7xx_hal_dma.h"
 #include "stm32h743xx.h"
@@ -37,7 +36,6 @@
       __attribute__((section(".dma_buffer")))
 #endif
 
-DMA_HandleTypeDef hdma_dma_generator0;
 uint8_t DMABusyFlag = 0;
 
 
@@ -48,7 +46,7 @@ int main(void)
   InitSystemClock();
   InitGPIO();
   InitDAC();
-  InitUSB();
+  //InitUSB();
   InitTimers();
   InitDMA();
 

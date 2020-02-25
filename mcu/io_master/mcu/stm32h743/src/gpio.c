@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <unistd.h>
 #include "stm32h7xx_hal.h"
-#include "stm32h7xx_hal_rcc.h"
 #include "stm32h743xx.h"
 #include "mcu_conf.h"
 

@@ -22,6 +22,11 @@ typedef struct {
   size_t length; ///< The lenght of the data (in bytes)
 } IOM_Output_Buffer;
 
+typedef enum {
+  IOM_REGISTER_HIGH, ///< The High Register
+  IOM_REGISTER_LOW, ///< THe Low Register 
+} IOM_REGISTER;
+
 #ifdef __cplusplus
 }
 #endif

@@ -37,8 +37,6 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Src/main.c \
-Src/usbd_conf.c \
-Src/usbd_desc.c \
 Src/stm32h7xx_it.c \
 Src/stm32h7xx_hal_msp.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pcd.c \
@@ -65,11 +63,6 @@ Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c \
 Src/system_stm32h7xx.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c \
-Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
-Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
-Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
-Src/usbd_cdc_if.c \
-Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c \
 io_master/src/data.c \
 io_master/src/iopin.c \
 io_master/mcu/stm32h743/src/clock.c \
@@ -77,7 +70,6 @@ io_master/mcu/stm32h743/src/dac.c \
 io_master/mcu/stm32h743/src/gpio.c \
 io_master/mcu/stm32h743/src/io_dma.c \
 io_master/mcu/stm32h743/src/timer.c \
-io_master/mcu/stm32h743/src/usb.c
 
 # ASM sources
 ASM_SOURCES =  \

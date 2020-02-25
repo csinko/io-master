@@ -2,8 +2,6 @@
 #include <stdint.h>
 #include <unistd.h>
 #include "stm32h7xx_hal.h"
-#include "stm32h7xx_hal_pwr_ex.h"
-#include "stm32h7xx_hal_pwr.h"
 #include "stm32h743xx.h"
 
 IOM_ERROR InitSystemClock(void) {
@@ -33,7 +31,7 @@ IOM_ERROR InitSystemClock(void) {
 
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    Error_Handler();
+    return IOM_ERROR_INVALID; //TODO put a better error here
   }
 
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -49,7 +47,7 @@ IOM_ERROR InitSystemClock(void) {
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
-    Error_Handler();
+    return IOM_ERROR_INVALID; //TODO put a better error here
   }
 
   return IOM_OK;
