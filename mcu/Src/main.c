@@ -50,8 +50,6 @@ int main(void)
   InitTimers();
   InitDMA();
 
-  GPIOF->ODR = 0xFFFF;
-
   while (1)
   {
 

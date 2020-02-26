@@ -7,7 +7,12 @@ extern "C" {
 #include "core.h"
 #include "stm32h7xx_hal.h"
 
+DAC_HandleTypeDef hdac1;
+I2C_HandleTypeDef hi2c3;
+
 IOM_ERROR InitDAC(void);
+
+IOM_ERROR InitI2CDAC(void);
 
 void ErrorLight(HAL_StatusTypeDef HalStatus);
 
@@ -21,7 +26,7 @@ uint8_t ReadExtDAC(IOM_REGISTER register, IOM_REGISTER level, uint8_t channel);
 
 IOM_ERROR WriteMcuDAC(uint8_t channel, float Vout);
 
-IOM_ERROR WriteRaeMcuDAC(uint8_t channel, uint16_t dacVal);
+IOM_ERROR WriteRawMcuDAC(uint8_t channel, uint16_t dacVal);
 
 
 

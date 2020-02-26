@@ -27,6 +27,16 @@ typedef enum {
   IOM_REGISTER_LOW, ///< THe Low Register 
 } IOM_REGISTER;
 
+typedef enum {
+IOM_STATE_READY, ///< Ready to send or receive data
+IOM_STATE_INIT, ///< Device Initialization
+IOM_STATE_CONF, ///< Device Configuration
+IOM_STATE_BUSY, ///< Actively sending or receiving data
+IOM_STATE_ERROR, ///< There was an error
+} IOM_STATE;
+
+IOM_STATE IOMState;
+
 #ifdef __cplusplus
 }
 #endif
