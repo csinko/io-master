@@ -304,33 +304,105 @@ IOM_ERROR InitGPIO(void) {
   const uint16_t GPIOH_AF_PINS = 0
   ;
 
+
+  //Low speed Output pins
+
+  const uint16_t GPIOA_OUTPUT_PINS = 0
+  #ifdef IOM_8_IO_PINS
+  | IO_6_PU_Pin
+  #endif
+  ;
+
+  const uint16_t GPIOB_OUTPUT_PINS = 0
+  | IO_1_PU_Pin
+  | IO_1_PD_N_Pin
+  | IO_4_PU_Pin
+  #ifdef IOM_8_IO_PINS
+  | IO_6_PD_N_Pin
+  #endif
+  ;
+
+  const uint16_t GPIOC_OUTPUT_PINS = 0
+  | IO_4_PD_N_Pin
+  | IO_3_4_DIFF_Pin
+  | IO_3_4_TERM_N_Pin
+  #ifdef IOM_8_IO_PINS
+  | IO_5_6_DIFF_Pin
+  | IO_7_PU_Pin
+  | IO_7_PD_N_Pin
+  | IO_8_PU_Pin
+  | IO_8_PD_N_Pin
+  | IO_7_8_DIFF_Pin
+  | IO_5_6_TERM_N_Pin
+  | IO_7_8_TERM_N_Pin
+  #endif
+  ;
+
+  const uint16_t GPIOD_OUTPUT_PINS = 0
+  | IO_1_TRIS_N_Pin
+  | IO_2_TRIS_N_Pin
+  | IO_3_TRIS_N_Pin
+  | IO_4_TRIS_N_Pin
+  #ifdef IOM_8_IO_PINS
+  | IO_5_TRIS_N_Pin
+  | IO_6_TRIS_N_Pin
+  | IO_7_TRIS_N_Pin
+  | IO_8_TRIS_N_Pin
+  #endif
+  ;
+
+  const uint16_t GPIOE_OUTPUT_PINS = 0
+  ;
+
+  const uint16_t GPIOF_OUTPUT_PINS = 0
+  | STATUS_R_Pin
+  | STATUS_G_Pin
+  | STATUS_B_Pin
+  ;
+
+  const uint16_t GPIOG_OUTPUT_PINS = 0
+  | IO_2_PU_Pin
+  | IO_2_PD_N_Pin
+  | IO_1_2_DIFF_Pin
+  | IO_1_2_TERM_N_Pin
+  | IO_3_PU_Pin
+  | IO_3_PD_N_Pin
+  #ifdef IOM_8_IO_PINS
+  | IO_5_PU_Pin
+  | IO_5_PD_N_Pin
+  #endif
+  ;
+
+  const uint16_t GPIOH_OUTPUT_PINS = 0
+  ;
+
   //Configure everything else as a low speed output pin
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 
-  GPIO_InitStruct.Pin = ~(GPIOA_INPUT_PINS | GPIOA_AF_PINS);
+  GPIO_InitStruct.Pin = GPIOA_OUTPUT_PINS;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = ~(GPIOB_INPUT_PINS | GPIOB_AF_PINS);
+  GPIO_InitStruct.Pin = GPIOB_OUTPUT_PINS;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = ~(GPIOC_INPUT_PINS | GPIOC_AF_PINS);
+  GPIO_InitStruct.Pin = GPIOC_OUTPUT_PINS;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = ~(GPIOD_INPUT_PINS | GPIOD_AF_PINS);
+  GPIO_InitStruct.Pin = GPIOD_OUTPUT_PINS;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = ~(GPIOE_INPUT_PINS | GPIOE_AF_PINS);
+  GPIO_InitStruct.Pin = GPIOE_OUTPUT_PINS;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = ~(GPIOF_INPUT_PINS | GPIOF_AF_PINS);
+  GPIO_InitStruct.Pin = GPIOF_OUTPUT_PINS;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = ~(GPIOG_INPUT_PINS | GPIOG_AF_PINS);
+  GPIO_InitStruct.Pin = GPIOG_OUTPUT_PINS;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = ~(GPIOH_INPUT_PINS | GPIOH_AF_PINS);
+  GPIO_InitStruct.Pin = GPIOH_OUTPUT_PINS;
   HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
   return IOM_OK;

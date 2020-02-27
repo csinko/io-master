@@ -213,3 +213,6 @@ clean:
 flash-openocd: $(BUILD_DIR)/$(TARGET).elf
 	openocd -f /usr/share/openocd/scripts/board/st_nucleo_h743zi.cfg -c init -c targets -c 'reset halt' -c 'flash write_image erase build/stm32h7_test_led.elf' -c 'reset halt' -c 'reset run' -c shutdown
 # *** EOF ***
+#
+openocd:
+	openocd -f /usr/share/openocd/scripts/board/st_nucleo_h743zi.cfg
