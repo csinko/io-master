@@ -1,6 +1,5 @@
 #include "uart.h"
 #include "stm32h7xx_hal.h"
-#include "stm32h7xx.h"
 
 UART_HandleTypeDef  hUART = {0};
 
@@ -23,7 +22,14 @@ IOM_ERROR InitUART(void) {
     {
         return IOM_ERROR_INVALID; //TODO replace with better error
     }
-
   return IOM_OK;
+}
 
+IOM_ERROR UARTSendString(const char* string) {
+    uint16_t size = 0;
+    while (string[size] != '\0') size++;
+    if (HAL_UART_Transmit(&hUART, (uint8_t*)string, size, 5000) != HAL_OK) {
+        return IOM_ERROR_INVALID; //TODO replace with better error
+    }
+    return IOM_OK;
 }

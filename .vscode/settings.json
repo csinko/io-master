@@ -13,6 +13,7 @@
         "clock.h": "c",
         "usb.h": "c",
         "timer.h": "c",
-        "io_dma.h": "c"
+        "io_dma.h": "c",
+        "uart.h": "c"
     }
 }

@@ -11,6 +11,8 @@ UART_HandleTypeDef hUART;
 
 IOM_ERROR InitUART(void);
 
+IOM_ERROR UARTSendString(const char* string);
+
 #ifdef __cplusplus
 }
 #endif

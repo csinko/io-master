@@ -25,8 +25,10 @@
 #include "io_dma.h"
 #include "timer.h"
 #include "dac.h"
+#include "uart.h"
 #include "stm32h7xx_hal_dma.h"
 #include "stm32h743xx.h"
+#include "log.h"
 
 #if defined( __ICCARM__ )
   #define DMA_BUFFER \
@@ -45,10 +47,13 @@ int main(void)
   HAL_Init();
   InitSystemClock();
   InitGPIO();
+  InitUART();
   InitDAC();
   //InitUSB();
   InitTimers();
   InitDMA();
+  IOMLog("Device is up!");
+
 
   while (1)
   {
@@ -66,22 +71,5 @@ int main(void)
     }
   }
 }
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{ 
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
