@@ -12,7 +12,7 @@
             "intelliSenseMode": "clang-x64"
         },
         {
-            "name": "IO Master",
+            "name": "IO Master Linux",
             "includePath": [
                 "${workspaceFolder}/mcu/Inc",
                 "${workspaceFolder}/mcu/Drivers/STM32H7xx_HAL_Driver/Inc",
@@ -36,6 +36,36 @@
                 "path": [
                     "${workspaceFolder}",
                     "usr/lib/gcc/arm-none-eabi/9.2.0"
+                ],
+                "limitSymbolsToIncludedHeaders": false,
+                "databaseFilename": ""
+            }
+        },
+        {
+            "name": "IO Master Windows",
+            "includePath": [
+                "${workspaceFolder}/mcu/Inc",
+                "${workspaceFolder}/mcu/Drivers/STM32H7xx_HAL_Driver/Inc",
+                "${workspaceFolder}/mcu/Drivers/STm32H7xx_HAL_Driver/Inc/Legacy",
+                "${workspaceFolder}/mcu/Middlewares/ST/STM32_USB_Device_Library/Core/Inc",
+                "${workspaceFolder}/mcu/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
+                "${workspaceFolder}/mcu/Drivers/CMSIS/Include",
+                "${workspaceFolder}/mcu/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc",
+                "${workspaceFolder}/mcu/io_master/mcu/stm32h743/inc",
+                "${workspaceFolder}/mcu/io_master/inc",
+                "C:\\ST\\STM32CubeIDE_1.0.2\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltools.gnu-arm-embedded.7-2018-q2-update.win32_1.0.0.201904081647\\tools\\lib\\gcc\\arm-none-eabi\\7.3.1\\include",
+                "C:\\ST\\STM32CubeIDE_1.0.2\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltools.gnu-arm-embedded.7-2018-q2-update.win32_1.0.0.201904081647\\tools\\lib\\gcc\\arm-none-eabi\\7.3.1\\include-fixed"
+
+            ],
+            "defines": [
+                "USE_HAL_DRIVER",
+                "STM32H743xx"
+            ],
+            "intelliSenseMode": "gcc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "C:\\ST\\STM32CubeIDE_1.0.2\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltools.gnu-arm-embedded.7-2018-q2-update.win32_1.0.0.201904081647\\tools\\lib\\gcc\\arm-none-eabi\\7.3.1"
                 ],
                 "limitSymbolsToIncludedHeaders": false,
                 "databaseFilename": ""
