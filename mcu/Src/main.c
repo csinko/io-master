@@ -47,12 +47,16 @@ int main(void)
   HAL_Init();
   InitSystemClock();
   InitGPIO();
-  InitUART();
-  InitDAC();
+  //InitUART();
+  //InitDAC();
   //InitUSB();
-  InitTimers();
-  InitDMA();
-  IOMLog("Device is up!");
+  //InitTimers();
+  //InitDMA();
+  //IOMLog("Device is up!");
+  while (1) {
+    HAL_GPIO_TogglePin(STATUS_R_GPIO_Port, STATUS_R_Pin);
+    HAL_Delay(500);
+  }
 
 
   while (1)
