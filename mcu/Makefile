@@ -70,6 +70,7 @@ io_master/mcu/stm32h743/src/dac.c \
 io_master/mcu/stm32h743/src/gpio.c \
 io_master/mcu/stm32h743/src/io_dma.c \
 io_master/mcu/stm32h743/src/timer.c \
+io_master/mcu/stm32h743/src/uart.c \
 
 # ASM sources
 ASM_SOURCES =  \
