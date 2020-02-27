@@ -49,7 +49,15 @@ int main(void)
   InitGPIO();
   InitUART();
   InitDAC();
+<<<<<<< HEAD
   //InitUSB();
+=======
+  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
+  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
+  unsigned int num1 = 0, num2 = 2048;
+  
+  InitUSB();
+>>>>>>> fb2b4b13b8c0771b565e54a28571ced2d28cc765
   InitTimers();
   InitDMA();
   IOMLog("Device is up!");
@@ -72,4 +80,37 @@ int main(void)
   }
 }
 
+<<<<<<< HEAD
+=======
+
+
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    if(GPIO_Pin == USER_Btn_Pin) {
+      //Queue the data to be sent
+      uint8_t dataToSend = 0b10111111;
+      QueueOutputDataToSend(&dataToSend, 1, 1);
+    }
+}
+
+
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{ 
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
+
+>>>>>>> fb2b4b13b8c0771b565e54a28571ced2d28cc765
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
