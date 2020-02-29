@@ -9,6 +9,9 @@ extern "C" {
 #define DMA_WRITE_BUF_MAX_ADDR ((void*) DMA_WRITE_BUF_MIN_ADDR + DMA_OUTPUT_BUF_MAX_SIZE) ///< The ending address of the DMA Write buffer
 #define OUTPUT_BUF_QUEUE_MAX_SIZE 10 ///< The size of the DMA output buffer queue
 
+//UART Buffer Size Definitions
+#define UART_TX_BUF_QUEUE_MAX_SIZE 10 ///< The size of the UART output buffer queue
+
 //IO Software Pin Definitions
 #define IO_PIN_GPIO_INPUT_PORT GPIOE
 #define IO_PIN_GPIO_INPUT_OFFSET 2
