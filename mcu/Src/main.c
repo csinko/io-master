@@ -29,6 +29,7 @@
 #include "stm32h7xx_hal_dma.h"
 #include "stm32h743xx.h"
 #include "log.h"
+#include <stdlib.h>
 
 #if defined( __ICCARM__ )
   #define DMA_BUFFER \
@@ -47,7 +48,13 @@ int main(void)
   HAL_Init();
   InitSystemClock();
   InitGPIO();
-  InitUART();
+  IOM_ERROR err = InitUART();
+  if (err == IOM_ERROR_INVALID) {
+    HAL_Delay(1000);
+  }
+  uint8_t* pData = malloc(1);
+  UARTQueueRXData(pData, 1);
+
   //InitDAC();
   //InitUSB();
   //InitTimers();

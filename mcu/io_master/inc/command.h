@@ -4,6 +4,8 @@
 extern "C" {
 #endif
 
+#include "core.h"
+
 typedef enum {
     targetDeviceVolt,
     pin1Params,         
@@ -14,6 +16,16 @@ typedef enum {
     signalMode,    
 } CommandTag;
 
+typedef enum {
+    IOM_CS_NEW,
+    IOM_CS_INCOMPLETE,
+} IOM_COMMAND_STATUS;
+
+uint8_t current_command[5];
+
+IOM_COMMAND_STATUS command_status;
+
+void ProcessCommand(IOM_Output_Buffer buffer);
 void RunCommand(uint8_t* comm);
 void SetPinParams(uint8_t pinNum, uint8_t* comm);
 void SetTargetDeviceVolt(uint8_t* comm);

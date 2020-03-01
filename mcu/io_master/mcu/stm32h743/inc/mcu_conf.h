@@ -3,6 +3,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "stm32h743xx.h"
 //DMA Buffer Size Definitions
 #define DMA_OUTPUT_BUF_MAX_SIZE 1024 ///< A max size so the buffer memory domain doesn't fill up
 #define DMA_WRITE_BUF_MIN_ADDR ((void*) 0x30000000) ///< The starting address of the DMA write buffer
@@ -11,6 +13,7 @@ extern "C" {
 
 //UART Buffer Size Definitions
 #define UART_TX_BUF_QUEUE_MAX_SIZE 10 ///< The size of the UART output buffer queue
+#define UART_RX_BUF_QUEUE_MAX_SIZE 10 ///< The size of the UART input buffer queue
 
 //IO Software Pin Definitions
 #define IO_PIN_GPIO_INPUT_PORT GPIOE

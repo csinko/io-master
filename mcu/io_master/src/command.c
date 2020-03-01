@@ -1,6 +1,56 @@
+#include "core.h"
 #include "command.h"
 #include "mcu_conf.h"
 #include "stm32h7xx_hal.h"
+#include "uart.h"
+#include <string.h>
+#include <stdlib.h>
+
+uint8_t current_command[5] = {0};
+IOM_COMMAND_STATUS command_status = IOM_CS_NEW;
+
+void ProcessCommand(IOM_Output_Buffer buffer) {
+    //New command, should be 1 byte
+    if(command_status == IOM_CS_NEW) {
+        if (buffer.length != 1) {
+            //Garbage
+            free(buffer.data);
+            uint8_t* pData = malloc(1);
+            UARTQueueRXData(pData, 1);
+            return;
+        }
+        current_command[0] = *(buffer.data);
+        free(buffer.data);
+        uint8_t commTag = (current_command[0] & 0b01110000) >> 4;
+        uint8_t bytesToGet = 1;
+        if (commTag > 0 && commTag < 5) {
+            command_status = IOM_CS_INCOMPLETE;
+            bytesToGet = 4;
+        } else if (commTag == 0) {
+            command_status = IOM_CS_INCOMPLETE;
+            bytesToGet = 2;
+        }
+        uint8_t* pData = malloc(bytesToGet);
+        UARTQueueRXData(pData, bytesToGet);
+        return;
+    }
+    if (command_status == IOM_CS_INCOMPLETE) {
+       if (buffer.length > 4) {
+           //Garbage
+           free(buffer.data);
+           uint8_t* pData = malloc(1);
+           UARTQueueRXData(pData, 1);
+           return;
+       } 
+       memcpy(&current_command[1], buffer.data, buffer.length);
+       free(buffer.data);
+       command_status = IOM_CS_NEW;
+       RunCommand(&current_command[0]);
+       uint8_t* pData = malloc(1);
+       UARTQueueRXData(pData, 1);
+       return;
+    }
+}
 
 void RunCommand(uint8_t* comm)
 {
@@ -12,20 +62,20 @@ void RunCommand(uint8_t* comm)
         //Set cases
         switch(commTag)
         {
-            case targetDeviceVolt:
-                setTargetDeviceVolt(comm);
+            case 0:
+                SetTargetDeviceVolt(comm);
                 break;
             case pin1Params:
             case pin2Params:
             case pin3Params:
             case pin4Params:
-                setPinParams(commTag, comm);
+                SetPinParams(commTag, comm);
                 break;
             case dataSpeed:
-                setDataSpeed(comm);
+                SetDataSpeed(comm);
                 break;
             case signalMode:
-                setSignalMode(comm);
+                SetSignalMode(comm);
                 break;
             default:
                 //error case
@@ -38,19 +88,19 @@ void RunCommand(uint8_t* comm)
         switch(commTag)
         {
             case targetDeviceVolt:
-                getTargetDeviceVolt(comm);
+                GetTargetDeviceVolt(comm);
                 break;
             case pin1Params:
             case pin2Params:
             case pin3Params:
             case pin4Params:
-                getPinParams(commTag, comm);
+                GetPinParams(commTag, comm);
                 break;
             case dataSpeed:
-                getDataSpeed(comm);
+                GetDataSpeed(comm);
                 break;
             case signalMode:
-                getSignalMode(comm);
+                GetSignalMode(comm);
                 break;
             default:
                 //error case
@@ -70,13 +120,13 @@ void SetPinParams(uint8_t pinNum, uint8_t* comm)
     uint16_t VH = (comm[1]<<8) | comm[2];
     uint16_t VL = (comm[3]<<8) | comm[4];
 
-    GPIO_TypeDef pullDownPort;
-    uint16_t pullDownPin;
-    GPIO_TypeDef pullUpPort;
-    uint16_t pullUpPin;
+    GPIO_TypeDef* pullDownPort = 0;
+    uint16_t pullDownPin = 0;
+    GPIO_TypeDef* pullUpPort = 0;
+    uint16_t pullUpPin = 0;
 
-    GPIO_TypeDef triStatePort;
-    uint16_t triStaePin;
+    GPIO_TypeDef* triStatePort = 0;
+    uint16_t triStatePin = 0;
 
     switch(pinNum) {
         case 1:
@@ -139,6 +189,7 @@ void SetPinParams(uint8_t pinNum, uint8_t* comm)
 void SetTargetDeviceVolt(uint8_t* comm)
 {
     //uint16_t Volt = (comm[1]<<8) | comm[2];
+    HAL_Delay(1000);
 
     //writeMcuDac(1, Volt);
     return;
