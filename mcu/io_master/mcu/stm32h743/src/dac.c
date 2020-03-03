@@ -6,18 +6,12 @@
 
   DAC_HandleTypeDef hdac1 = {0};
   I2C_HandleTypeDef hi2c3 = {0};
-
-  static const uint8_t EXT_DAC_ADDR = 0b1100000 << 1; // Default address for MCP4728 DAC
-  //TODO: Implement multiple Dac Addresses for VH Dac and VL Dac
-
-  static const uint8_t EXT_DAC_ADDR_UPDATE = 0x00; // General Call Commands address for MCP4728 DAC
-  static const uint8_t bufUpdate = 0x08;//General Call Software Update
-  static const uint8_t bufVRef = 0x80;//Select VRef Bit
   
-  uint8_t Hbuf[8];//Buffer for Fast Write Command to VH DAC  
-  uint8_t Lbuf[8];//Buffer for Fast Write Command to VL DAC
-  uint8_t buf[8];//Buffer //todo Rename this
-
+  uint8_t IO_DAC_UPDATE_BUF = 0x08; //General Call Software Update
+  uint8_t IO_DAC_VREF_BUF = 0x80; //Select VRef Bit
+  
+  //CH1 VH, CH1 VL, CH2 VH, CH2 VL ...
+  uint16_t io_dac_buf[8] = {0}; //Buffer for all VH/VL values
 
   IOM_ERROR InitDAC(void)
   {
@@ -72,109 +66,86 @@
       while(1){}
     }
   }
+
   //TESTING
-  IOM_ERROR WriteAllExtDAC(float Vout)
+  IOM_ERROR WriteExtDAC(IOM_REGISTER reg, uint8_t channel, float Vout)
   {
-//    HAL_StatusTypeDef ret;
-    uint16_t DAC_VALUE = round(136.5 * (15 - Vout));//((2^12 - 1) / 30) * (15 - Vout)
+    //HAL_StatusTypeDef ret;
+    uint16_t dacVal = round(136.5 * (15 - Vout));//((2^12 - 1) / 30) * (15 - Vout)
+    io_dac_buf[(channel - 1) * 2 + reg] = dacVal;
 
-    //Write DAC_Value into all 4 channels
-    for(uint8_t i = 0;i < 8; i+=2)
-    {
-          buf[i] = (DAC_VALUE>>8) & 0x0F;
-          buf[i+1] = DAC_VALUE;
-    }
-    //Set VRef
-    HAL_I2C_Master_Transmit(&hi2c3, EXT_DAC_ADDR, &bufVRef, 1, HAL_MAX_DELAY);
-    //errorLight(ret);
-
-    //Write Channel Registers
-    HAL_I2C_Master_Transmit(&hi2c3, EXT_DAC_ADDR, &buf[0], 8, HAL_MAX_DELAY);
-    //errorLight(ret);
-
-    //Update Voltages
-    HAL_I2C_Master_Transmit(&hi2c3, EXT_DAC_ADDR_UPDATE, &bufUpdate, 1, HAL_MAX_DELAY);
-    //errorLight(ret);
-    return IOM_OK;
-  }
-  //TESTING
-  IOM_ERROR WriteExtDAC(uint8_t channel, float Vout)
-  {
-    HAL_StatusTypeDef ret;
-
-    uint16_t DAC_VALUE = round(136.5 * (15 - Vout));//((2^12 - 1) / 30) * (15 - Vout)
-    buf[2*channel-2] = (DAC_VALUE>>8) & 0x0F;
-    buf[2*channel-1] = DAC_VALUE;
-        
-    //Set VRef
-    HAL_I2C_Master_Transmit(&hi2c3, EXT_DAC_ADDR, &bufVRef, 1, HAL_MAX_DELAY);
-    //errorLight(ret);
-
-    //Write Channel Registers
-    HAL_I2C_Master_Transmit(&hi2c3, EXT_DAC_ADDR, &buf[0], 8, HAL_MAX_DELAY);
-    //errorLight(ret);
-
-    //Update Voltages
-    HAL_I2C_Master_Transmit(&hi2c3, EXT_DAC_ADDR_UPDATE, &bufUpdate, 1, HAL_MAX_DELAY);
-    //errorLight(ret);
-    return IOM_OK;
-  }
-
-
-  IOM_ERROR WriteRegExtDAC(IOM_REGISTER reg, uint8_t channel, uint16_t Vout)
-  {
-    HAL_StatusTypeDef ret;
     uint8_t *buf;
-    switch(reg) {
-      case IOM_REGISTER_HIGH:
-        buf = (uint8_t*) &Hbuf;
+    uint16_t addr;
+    switch(channel) {
+      case 1:
+      case 2:
+        buf = (uint8_t*) &io_dac_buf[0];
+        addr = IO_DAC_CH_1_2_ADDR;
         break;
-      case IOM_REGISTER_LOW:
-        buf = (uint8_t*) &Lbuf;
+      case 3:
+      case 4:
+        buf = (uint8_t*) &io_dac_buf[8];
+        addr = IO_DAC_CH_3_4_ADDR;
         break;
       default:
         return IOM_ERROR_INVALID;
     }
-
-    buf[2*channel-2] = (Vout>>8) & 0x0F;
-    buf[2*channel-1] = Vout;
         
-    //Set VRef //needs moved to startup
-    HAL_I2C_Master_Transmit(&hi2c3, EXT_DAC_ADDR, &bufVRef, 1, HAL_MAX_DELAY);
+    //Set VRef 
+    //TODO: needs moved to startup
+    HAL_I2C_Master_Transmit(&hi2c3, addr, &IO_DAC_VREF_BUF, 1, HAL_MAX_DELAY);
     //errorLight(ret);
 
     //Write Channel Registers
-    HAL_I2C_Master_Transmit(&hi2c3, EXT_DAC_ADDR, buf, 8, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 8, HAL_MAX_DELAY);
     //errorLight(ret);
 
     //Update Voltages
-    HAL_I2C_Master_Transmit(&hi2c3, EXT_DAC_ADDR_UPDATE, &bufUpdate, 1, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c3, IO_DAC_UPDATE_ADDR, &IO_DAC_UPDATE_BUF, 1, HAL_MAX_DELAY);
+    //errorLight(ret);
+    return IOM_OK;
+  }
+
+  IOM_ERROR WriteRegExtDAC(IOM_REGISTER reg, uint8_t channel, uint16_t Vout)
+  {
+    //HAL_StatusTypeDef ret;
+    io_dac_buf[(channel - 1) * 2 + reg] = Vout;
+
+    uint8_t *buf;
+    uint16_t addr;
+    switch(channel) {
+      case 1:
+      case 2:
+        buf = (uint8_t*) &io_dac_buf[0];
+        addr = IO_DAC_CH_1_2_ADDR;
+        break;
+      case 3:
+      case 4:
+        buf = (uint8_t*) &io_dac_buf[8];
+        addr = IO_DAC_CH_3_4_ADDR;
+        break;
+      default:
+        return IOM_ERROR_INVALID;
+    }
+        
+    //Set VRef 
+    //TODO: needs moved to startup
+    HAL_I2C_Master_Transmit(&hi2c3, addr, &IO_DAC_VREF_BUF, 1, HAL_MAX_DELAY);
+    //errorLight(ret);
+
+    //Write Channel Registers
+    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 8, HAL_MAX_DELAY);
+    //errorLight(ret);
+
+    //Update Voltages
+    HAL_I2C_Master_Transmit(&hi2c3, IO_DAC_UPDATE_ADDR, &IO_DAC_UPDATE_BUF, 1, HAL_MAX_DELAY);
     //errorLight(ret);
     return IOM_OK;
   }
   
-  uint8_t ReadExtDac(IOM_REGISTER reg, IOM_REGISTER level, uint8_t channel)
+  uint16_t ReadExtDac(IOM_REGISTER reg, uint8_t channel)
   {
-    uint8_t *buf;
-    switch(reg) {
-      case IOM_REGISTER_HIGH:
-        buf = (uint8_t*) &Hbuf;
-        break;
-      case IOM_REGISTER_LOW:
-        buf = (uint8_t*) &Lbuf;
-        break;
-      default:
-        return 0;
-    }
-
-    switch(level) {
-      case IOM_REGISTER_HIGH:
-        return buf[2*channel-1];
-      case IOM_REGISTER_LOW:
-        return buf[2*channel-2];
-      default:
-        return 0;
-    }
+    return io_dac_buf[(channel - 1) * 2 + reg];
   }
 
   //TESTING
