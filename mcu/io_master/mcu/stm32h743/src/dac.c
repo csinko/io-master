@@ -86,8 +86,13 @@
   //TESTING
   IOM_ERROR WriteExtDAC(IOM_REGISTER reg, uint8_t channel, float Vout)
   {
-    //HAL_StatusTypeDef ret;
     uint16_t dacVal = round(136.5 * (15 - Vout));//((2^12 - 1) / 30) * (15 - Vout)
+    return WriteRegExtDAC(reg, channel, dacVal);
+  }
+
+  IOM_ERROR WriteRegExtDAC(IOM_REGISTER reg, uint8_t channel, uint16_t dacVal)
+  {
+    //HAL_StatusTypeDef ret;
     io_dac_buf[(channel - 1) * 4 + 2*reg] = (dacVal >> 8) & 0x00FF;
     io_dac_buf[(channel - 1) * 4 + 2*reg + 1] = dacVal & 0x00FF;
 
@@ -106,47 +111,13 @@
         break;
       default:
         return IOM_ERROR_INVALID;
-    }
-        
+    }        
 
     //Write Channel Registers
     HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 8, HAL_MAX_DELAY);
 
     //Update Voltages
     HAL_I2C_Master_Transmit(&hi2c3, IO_DAC_UPDATE_ADDR, &IO_DAC_UPDATE_BUF, 1, HAL_MAX_DELAY);
-    return IOM_OK;
-  }
-
-  IOM_ERROR WriteRegExtDAC(IOM_REGISTER reg, uint8_t channel, uint16_t Vout)
-  {
-    //HAL_StatusTypeDef ret;
-    io_dac_buf[(channel - 1) * 2 + reg] = Vout;
-
-    uint8_t *buf;
-    uint16_t addr;
-    switch(channel) {
-      case 1:
-      case 2:
-        buf = (uint8_t*) &io_dac_buf[0];
-        addr = IO_DAC_CH_1_2_ADDR;
-        break;
-      case 3:
-      case 4:
-        buf = (uint8_t*) &io_dac_buf[8];
-        addr = IO_DAC_CH_3_4_ADDR;
-        break;
-      default:
-        return IOM_ERROR_INVALID;
-    }
-        
-
-    //Write Channel Registers
-    HAL_I2C_Master_Transmit(&hi2c3, addr, &io_dac_buf[0], 8, HAL_MAX_DELAY);
-    //errorLight(ret);
-
-    //Update Voltages
-    HAL_I2C_Master_Transmit(&hi2c3, IO_DAC_UPDATE_ADDR, &IO_DAC_UPDATE_BUF, 1, HAL_MAX_DELAY);
-    //errorLight(ret);
     return IOM_OK;
   }
   
@@ -156,33 +127,23 @@
   }
 
   //TESTING
-  //TODO make this work
   IOM_ERROR WriteMCUDAC(uint8_t channel, float Vout)
   {
-    if(channel == 1)
-    {
-      channel = DAC1_CHANNEL_1;
-    }
-    else if(channel == 2)
-    {
-      channel = DAC1_CHANNEL_2;
-    }
-    else {
-      return IOM_ERROR_INVALID; //Channel is invalid
-    }
-
-    uint16_t DAC_VALUE = round(Vout*4095/3.3);
-
-    //Write Channel Register
-    HAL_DAC_SetValue(&hdac1, channel, DAC_ALIGN_12B_R, DAC_VALUE);
-
-    return IOM_OK;
+    float vDac = (12*Vout-1.24)/11;
+    uint16_t dacVal = round(vDac*4095/3.3);
+    return WriteRawMCUDAC(channel, dacVal);
   }
 
   //channel: expects 1 or 2
   //dacVal: expects the 12-bit bitpattern scaled for 3.3V Max
-  IOM_ERROR WriteRawMcuDac(uint8_t channel, uint16_t dacVal)
+  IOM_ERROR WriteRawMCUDAC(uint8_t channel, uint16_t dacVal)
   {
+    //Vout < 3.3v or Vout > 15v
+    if(dacVal < 4327 || dacVal > 20166)
+    {      
+      return IOM_ERROR_INVALID; //TODO put a better error here
+    }
+
     if(channel == 1)
     {
       channel = DAC1_CHANNEL_1;
@@ -190,6 +151,7 @@
     else if(channel == 2) 
     {
       //currently only using channel 1
+      return IOM_ERROR_INVALID; //TODO put a better error here
       channel = DAC1_CHANNEL_2;
     }
 
