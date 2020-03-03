@@ -33,6 +33,30 @@ IOM_ERROR SetIOPinDataState(size_t pinNumber, IOCFG_DATA_STATE dataState) {
   return IOM_OK;
 }
 
+IOM_ERROR GetDataState(uint8_t pinState, IOCFG_DATA_STATE* pDataState) {
+  if (pDataState == NULL) {
+    return IOM_ERROR_NULL_POINTER;
+  }
+  switch(pinState) {
+    case 0b00:
+      *pDataState = IOCFG_DATA_STATE_DISABLED; 
+      break;
+    case 0b01:
+      *pDataState = IOCFG_DATA_STATE_INPUT;
+      break;
+    case 0b10:
+      *pDataState = IOCFG_DATA_STATE_OUTPUT;
+      break;
+    case 0b11:
+      *pDataState = IOCFG_DATA_STATE_CLOCK;
+      break;
+    default:
+      return IOM_ERROR_INVALID;
+  }
+
+  return IOM_OK;
+}
+
 uint8_t GetIOPinOutputMask(uint8_t pinNumber) {
   switch(pinNumber) {
     case 1:

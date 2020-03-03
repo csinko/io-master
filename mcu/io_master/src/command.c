@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "dac.h"
+#include "iopin.h"
 
 uint8_t current_command[5] = {0};
 IOM_COMMAND_STATUS command_status = IOM_CS_NEW;
@@ -78,6 +79,8 @@ void RunCommand(uint8_t* comm)
             case signalMode:
                 SetSignalMode(comm);
                 break;
+            case pinStates:
+                SetPinStates(comm);
             default:
                 //error case
                 break;
@@ -232,6 +235,41 @@ void SetDataSpeed(uint8_t* comm)
     //uint speed;//TODO: Update when Set Data Speed Commmand established
 
     //return;
+}
+
+IOM_ERROR SetPinStates(uint8_t* comm) {
+    uint8_t pin1State = *(comm+1) & 0b11;
+    uint8_t pin2State = (*(comm+1) & 0b1100) >> 2;
+    uint8_t pin3State = (*(comm+1) & 0b110000) >> 4;
+    uint8_t pin4State = (*(comm+1) & 0b110000) >> 6;
+    IOCFG_DATA_STATE dataState = IOCFG_DATA_STATE_DISABLED;
+    IOM_ERROR err;
+    err = GetDataState(pin1State, &dataState);
+    if (err != IOM_OK) {
+        return err;
+    }
+    SetIOPinDataState(pin1State, dataState);
+
+    err = GetDataState(pin2State, &dataState);
+    if (err != IOM_OK) {
+        return err;
+    }
+    SetIOPinDataState(pin2State, dataState);
+
+    err = GetDataState(pin3State, &dataState);
+    if (err != IOM_OK) {
+        return err;
+    }
+    SetIOPinDataState(pin3State, dataState);
+
+    err = GetDataState(pin4State, &dataState);
+    if (err != IOM_OK) {
+        return err;
+    }
+    SetIOPinDataState(pin4State, dataState);
+
+    return IOM_OK;
+
 }
 
 IOM_ERROR GetPinParams(uint8_t pinNum, uint8_t* comm)

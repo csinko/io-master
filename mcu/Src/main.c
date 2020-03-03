@@ -65,7 +65,6 @@ int main(void)
 
   while (1) {
     HAL_GPIO_TogglePin(STATUS_B_GPIO_Port, STATUS_B_Pin);
-    HAL_GPIO_TogglePin(STATUS_B_GPIO_Port, STATUS_B_Pin);
     HAL_Delay(1000);
 
   }

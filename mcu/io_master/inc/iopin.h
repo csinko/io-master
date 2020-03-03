@@ -32,6 +32,7 @@ typedef enum {
 } IOCFG_DIFFERENTIAL;
 
 typedef enum {
+  IOCFG_DATA_STATE_DISABLED,
   IOCFG_DATA_STATE_INPUT,
   IOCFG_DATA_STATE_OUTPUT,
   IOCFG_DATA_STATE_CLOCK,
@@ -52,6 +53,7 @@ IOM_ERROR SetIOPinPolarity(size_t pinNumber, IOCFG_POLARITY polarity);
 IOM_ERROR EnableDifferentialMode(size_t pinNumber);
 IOM_ERROR DisableDifferentialMode(size_t pinNumber);
 IOM_ERROR SetIOPinDataState(size_t pinNumber, IOCFG_DATA_STATE dataState);
+IOM_ERROR GetDataState(uint8_t pinState, IOCFG_DATA_STATE* pDataState);
 
 uint8_t GetIOPinOutputMask(uint8_t pinNumber);
 uint8_t GetIOPinOutputPos(uint8_t pinNumber);
