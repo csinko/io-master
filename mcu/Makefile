@@ -217,4 +217,4 @@ flash-openocd: $(BUILD_DIR)/$(TARGET).elf
 # *** EOF ***
 #
 openocd:
-	openocd -f /usr/share/openocd/scripts/board/st_nucleo_h743zi.cfg
+	openocd -f /usr/share/openocd/scripts/board/st_nucleo_h743zi.cfg -c init -c targets -c 'reset_config none separate'

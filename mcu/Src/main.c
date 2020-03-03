@@ -46,8 +46,11 @@ uint8_t DMABusyFlag = 0;
 int main(void)
 {
   HAL_Init();
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
   InitSystemClock();
   InitGPIO();
+  InitDAC();
+  InitI2CDAC();
   IOM_ERROR err = InitUART();
   if (err == IOM_ERROR_INVALID) {
     HAL_Delay(1000);
@@ -55,14 +58,13 @@ int main(void)
   uint8_t* pData = malloc(1);
   UARTQueueRXData(pData, 1);
 
-  //InitDAC();
+
   //InitUSB();
   //InitTimers();
   //InitDMA();
 
   while (1) {
-    HAL_GPIO_TogglePin(STATUS_R_GPIO_Port, STATUS_R_Pin);
-    IOMLog("Toggling pin\n");
+    HAL_GPIO_TogglePin(STATUS_B_GPIO_Port, STATUS_B_Pin);
     HAL_Delay(1000);
   }
 

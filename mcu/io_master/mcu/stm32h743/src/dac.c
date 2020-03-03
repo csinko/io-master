@@ -7,17 +7,18 @@
   DAC_HandleTypeDef hdac1 = {0};
   I2C_HandleTypeDef hi2c3 = {0};
 
-  const uint8_t EXT_DAC_ADDR = 0b1100000 << 1; // Default address for MCP4728 DAC
+  
+
+  uint8_t EXT_DAC_ADDR = 0b1100000 << 1; // Default address for MCP4728 DAC
   //TODO: Implement multiple Dac Addresses for VH Dac and VL Dac
 
-  const uint8_t EXT_DAC_ADDR_UPDATE = 0x00; // General Call Commands address for MCP4728 DAC
-  const uint8_t bufUpdate = 0x08;//General Call Software Update
-  const uint8_t bufVRef = 0x80;//Select VRef Bit
+  uint8_t EXT_DAC_ADDR_UPDATE = 0x00; // General Call Commands address for MCP4728 DAC
+  uint8_t bufUpdate = 0x08;//General Call Software Update
+  uint8_t bufVRef = 0x80;//Select VRef Bit
   
   uint8_t Hbuf[8] = {0};//Buffer for Fast Write Command to VH DAC  
   uint8_t Lbuf[8] = {0};//Buffer for Fast Write Command to VL DAC
   uint8_t buf[8] = {0};//Buffer //todo Rename this
-
 
   IOM_ERROR InitDAC(void)
   {
@@ -48,9 +49,9 @@
     __HAL_RCC_I2C3_CLK_ENABLE();
     //TODO confirm this configuration is correct
     hi2c3.Instance              = I2C3;
-    hi2c3.Init.Timing           = 0x30F; //TODO populate me with the correct value
-    hi2c3.Init.OwnAddress1      = 0x00901954; //TODO populate me with the correct value
-    hi2c3.Init.AddressingMode   = I2C_ADDRESSINGMODE_10BIT;
+    hi2c3.Init.Timing           = 0x00B03FDB;
+    hi2c3.Init.OwnAddress1      = 0xFF; //TODO populate me with the correct value
+    hi2c3.Init.AddressingMode   = I2C_ADDRESSINGMODE_7BIT;
     hi2c3.Init.DualAddressMode  = I2C_DUALADDRESS_DISABLE;
     hi2c3.Init.OwnAddress2      = 0xFF;
     hi2c3.Init.GeneralCallMode  = I2C_GENERALCALL_DISABLE;

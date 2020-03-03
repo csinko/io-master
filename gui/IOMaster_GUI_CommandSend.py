@@ -176,8 +176,9 @@ def Configure_Results():
         VL = float(LVoltage)
 
     #rewr=1 because we are writing, commandbits determines what we are setting, resister State is unknown
+    ### No Push No Pull, VH, VL
     rewr = 1
-    commandbits = 0
+    commandbits = 1
     resisterStates = 0
     byteSend(rewr, commandbits, resisterStates, VH, VL)
 

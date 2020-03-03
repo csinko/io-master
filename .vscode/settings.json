@@ -16,6 +16,7 @@
         "io_dma.h": "c",
         "uart.h": "c",
         "mcu_conf.h": "c",
-        "command.h": "c"
+        "command.h": "c",
+        "dac.h": "c"
     }
 }

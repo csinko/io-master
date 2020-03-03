@@ -225,13 +225,13 @@ extern "C" {
 
 //Status LEDs
 #define STATUS_R_GPIO_Port GPIOF
-#define STATUS_R_Pin GPIO_PIN_0
+#define STATUS_R_Pin GPIO_PIN_1
 
 #define STATUS_G_GPIO_Port GPIOF
-#define STATUS_G_Pin GPIO_PIN_1
+#define STATUS_G_Pin GPIO_PIN_2
 
 #define STATUS_B_GPIO_Port GPIOF
-#define STATUS_B_Pin GPIO_PIN_2
+#define STATUS_B_Pin GPIO_PIN_0
 
 //External Crystal Input
 #define OSC_IN_GPIO_Port GPIOH
