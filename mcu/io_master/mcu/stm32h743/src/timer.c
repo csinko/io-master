@@ -58,7 +58,7 @@ IOM_ERROR InitTimers(void) {
   sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_ENABLE;
   HAL_TIMEx_ConfigBreakDeadTime(&htim8, &sBreakDeadTimeConfig);
 
-  HAL_TIM_MspPostInit(&htim8);
+  //HAL_TIM_MspPostInit(&htim8); //TODO make this work
   TIM8->BDTR |= TIM_BDTR_MOE;
 
   if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1) != HAL_OK) {

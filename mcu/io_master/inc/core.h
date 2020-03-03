@@ -17,6 +17,7 @@ typedef enum {
   IOM_ERROR_QUEUE_EMPTY, ///< The queue was empty
   IOM_ERROR_INVALID, ///< Invalid input
   IOM_ERROR_NOT_READY, ///< Not ready
+  IOM_ERROR_INTERFACE, ///< Something went wrong with the interface
 } IOM_ERROR;
 
 typedef struct {

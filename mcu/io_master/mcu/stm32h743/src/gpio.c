@@ -75,11 +75,16 @@ IOM_ERROR InitGPIO(void) {
   const uint16_t GPIOH_SET_PINS = 0
   ;
 
+//TODO determine if this pragma is the only way to avoid
+// the overflow error for GPIOB set RESET pins
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverflow"
   //Write all of the pin states
   HAL_GPIO_WritePin(GPIOA, GPIOA_SET_PINS, GPIO_PIN_SET);
   HAL_GPIO_WritePin(GPIOA, ~GPIOA_SET_PINS, GPIO_PIN_RESET);
 
   HAL_GPIO_WritePin(GPIOB, GPIOB_SET_PINS, GPIO_PIN_SET);
+
   HAL_GPIO_WritePin(GPIOB, ~GPIOB_SET_PINS, GPIO_PIN_RESET);
 
   HAL_GPIO_WritePin(GPIOC, GPIOC_SET_PINS, GPIO_PIN_SET);
@@ -99,6 +104,7 @@ IOM_ERROR InitGPIO(void) {
 
   HAL_GPIO_WritePin(GPIOH, GPIOH_SET_PINS, GPIO_PIN_SET);
   HAL_GPIO_WritePin(GPIOH, ~GPIOH_SET_PINS, GPIO_PIN_RESET);
+#pragma GCC diagnostic pop
 
   //Default input pin configuration (Clock and I/O In/Out Pins)
   const uint16_t GPIOA_INPUT_PINS = 0
@@ -148,6 +154,7 @@ IOM_ERROR InitGPIO(void) {
   #endif
   ;
 
+/**
   const uint16_t GPIOF_INPUT_PINS = 0
   //Must Configure Inputs
   ;
@@ -159,6 +166,8 @@ IOM_ERROR InitGPIO(void) {
   const uint16_t GPIOH_INPUT_PINS = 0
   //Must Configure Inputs
   ;
+
+  **/
 
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -262,6 +271,7 @@ IOM_ERROR InitGPIO(void) {
   GPIO_InitStruct.Alternate = GPIO_AF10_OTG1_FS;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+/**
   const uint16_t GPIOA_AF_PINS = 0
   | ULPI_D0_Pin
   | ULPI_CK_Pin
@@ -303,6 +313,7 @@ IOM_ERROR InitGPIO(void) {
   
   const uint16_t GPIOH_AF_PINS = 0
   ;
+  **/
 
 
   //Low speed Output pins

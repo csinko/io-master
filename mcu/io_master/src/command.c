@@ -5,6 +5,7 @@
 #include "uart.h"
 #include <string.h>
 #include <stdlib.h>
+#include "dac.h"
 
 uint8_t current_command[5] = {0};
 IOM_COMMAND_STATUS command_status = IOM_CS_NEW;
@@ -63,7 +64,7 @@ void RunCommand(uint8_t* comm)
         switch(commTag)
         {
             case 0:
-                SetTargetDeviceVolt(comm);
+                SetTargetDeviceVoltage(comm);
                 break;
             case pin1Params:
             case pin2Params:
@@ -88,7 +89,7 @@ void RunCommand(uint8_t* comm)
         switch(commTag)
         {
             case targetDeviceVolt:
-                GetTargetDeviceVolt(comm);
+                GetTargetDeviceVoltage(comm);
                 break;
             case pin1Params:
             case pin2Params:
@@ -111,7 +112,7 @@ void RunCommand(uint8_t* comm)
     return;
 }
 
-void SetPinParams(uint8_t pinNum, uint8_t* comm)
+IOM_ERROR SetPinParams(uint8_t pinNum, uint8_t* comm)
 {
     uint8_t pullDown = comm[0] & 0b0001;
     uint8_t pullUp = (comm[0] & 0b0010) >> 1;
@@ -162,7 +163,7 @@ void SetPinParams(uint8_t pinNum, uint8_t* comm)
             triStatePin = IO_4_TRIS_N_Pin;
             break;
         default:
-            break;
+            return IOM_ERROR_INVALID;
     }
 
     if (triState != 0) {
@@ -180,34 +181,48 @@ void SetPinParams(uint8_t pinNum, uint8_t* comm)
         HAL_GPIO_WritePin(triStatePort, triStatePin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(pullDownPort, pullDownPin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(pullUpPort, pullUpPin, GPIO_PIN_SET);
+    } else if (pullDown == 0 && pullUp == 0 && triState == 0) {
+        HAL_GPIO_WritePin(triStatePort, triStatePin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(pullDownPort, pullDownPin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(pullUpPort, pullUpPin, GPIO_PIN_RESET);
+    } else {
+        return IOM_ERROR_INVALID;
     }
-    //writeExtDac(true, pinNum, VH);
-    //writeExtDac(false, pinNum, VL);
+
+    WriteRegExtDAC(IOM_REGISTER_HIGH, pinNum, VH);
+    WriteRegExtDAC(IOM_REGISTER_LOW, pinNum, VL);
+    return IOM_OK;
 
 }
 
-void SetTargetDeviceVolt(uint8_t* comm)
+void SetTargetDeviceVoltage(uint8_t* comm)
 {
-    //uint16_t Volt = (comm[1]<<8) | comm[2];
-    HAL_Delay(1000);
-
-    //writeMcuDac(1, Volt);
-    return;
+    uint16_t voltage = (comm[1]<<8) | comm[2];
+    WriteMCUDAC(1, voltage);
 }
 
 void SetSignalMode(uint8_t* comm)
 {
-    //bool mode = comm[0] & 0b0001;
+    uint8_t pin12Mode = comm[0] & 0x01;
+    uint8_t pin34Mode = (comm[0] >> 1) & 0x01;
+    #ifdef IOM_8_IO_PINS
+    uint8_t pin56Mode = (comm[0] >> 2) & 0x01;
+    uint8_t pin78Mode = (comm[0] >> 3) & 0x01;
+    #endif
 
-    //HAL_GPIO_WritePin(IO_1_2_DIFF_GPIO_Port, IO_1_2_DIFF_Pin, mode);// might need to cast mode as GPIO_PinState
-    //HAL_GPIO_WritePin(IO_3_4_DIFF_GPIO_Port, IO_3_4_DIFF_Pin, mode);
-    ////HAL_GPIO_WritePin(IO_5_6_DIFF_GPIO_Port, IO_5_6_DIFF_Pin, mode);
-    ////HAL_GPIO_WritePin(IO_7_8_DIFF_GPIO_Port, IO_7_8_DIFF_Pin, mode);
+    HAL_GPIO_WritePin(IO_1_2_DIFF_GPIO_Port, IO_1_2_DIFF_Pin, (pin12Mode != 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IO_3_4_DIFF_GPIO_Port, IO_3_4_DIFF_Pin, (pin34Mode != 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    #ifdef IOM_8_IO_PINS
+    HAL_GPIO_WritePin(IO_5_6_DIFF_GPIO_Port, IO_5_6_DIFF_Pin, (pin56Mode != 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IO_7_8_DIFF_GPIO_Port, IO_7_8_DIFF_Pin, (pin78Mode != 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    #endif
 
-    //HAL_GPIO_WritePin(IO_1_2_TERM_N_GPIO_Port, IO_1_2_TERM_N_Pin, !mode);// might need to cast mode as GPIO_PinState
-    //HAL_GPIO_WritePin(IO_3_4_TERM_N_GPIO_Port, IO_3_4_TERM_N_Pin, !mode);
-    ////HAL_GPIO_WritePin(IO_5_6_TERM_N_GPIO_Port, IO_5_6_TERM_N_Pin, !mode);
-    ////HAL_GPIO_WritePin(IO_7_8_TERM_N_GPIO_Port, IO_7_8_TERM_N_Pin, mode);
+    HAL_GPIO_WritePin(IO_1_2_TERM_N_GPIO_Port, IO_1_2_TERM_N_Pin, (pin12Mode == 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IO_3_4_TERM_N_GPIO_Port, IO_3_4_TERM_N_Pin, (pin34Mode == 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    #ifdef IOM_8_IO_PINS
+    HAL_GPIO_WritePin(IO_5_6_TERM_N_GPIO_Port, IO_5_6_TERM_N_Pin, (pin56Mode == 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IO_7_8_TERM_N_GPIO_Port, IO_7_8_TERM_N_Pin, (pin78Mode == 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    #endif
 
     return;
 }
@@ -219,37 +234,76 @@ void SetDataSpeed(uint8_t* comm)
     //return;
 }
 
-void GetPinParams(uint8_t pinNum, uint8_t* comm)
+IOM_ERROR GetPinParams(uint8_t pinNum, uint8_t* comm)
 {
-    //uint8_t resStates;
-    //switch(pinNum)
-    //{
-    //    case 1:
-    //        resStates = (HAL_GPIO_ReadPin(IO_1_PU_GPIO_Port, IO_1_PU_Pin)<<1) & HAL_GPIO_ReadPin(IO_1_PD_GPIO_N_Port, IO_1_PD_N_Pin);
-    //        break;
-    //    case 2:
-    //        resStates = (HAL_GPIO_ReadPin(IO_2_PU_GPIO_Port, IO_2_PU_Pin)<<1) & HAL_GPIO_ReadPin(IO_2_PD_GPIO_N_Port, IO_2_PD_N_Pin);
-    //        break;
-    //    case 3:
-    //        resStates = (HAL_GPIO_ReadPin(IO_3_PU_GPIO_Port, IO_3_PU_Pin)<<1) & HAL_GPIO_ReadPin(IO_3_PD_GPIO_N_Port, IO_3_PD_N_Pin);
-    //        break;
-    //    case 4:
-    //        resStates = (HAL_GPIO_ReadPin(IO_4_PU_GPIO_Port, IO_4_PU_Pin)<<1) & HAL_GPIO_ReadPin(IO_4_PD_GPIO_N_Port, IO_4_PD_N_Pin);
-    //        break;
-    //    default:
-    //        //error
-    //}
-    //comm[0] = comm[0] & resState;
-    ////get VH
-    //comm[1] = readExtDac(true, true, pinNum);
-    //comm[2] = readExtDac(true, false, pinNum);
-    ////get VL
-    //comm[3] = readExtDac(false, true, pinNum);
-    //comm[4] = readExtDac(false, false, pinNum);
-    //return;
+    GPIO_TypeDef* pullDownPort = 0;
+    uint16_t pullDownPin = 0;
+    GPIO_TypeDef* pullUpPort = 0;
+    uint16_t pullUpPin = 0;
+
+    GPIO_TypeDef* triStatePort = 0;
+    uint16_t triStatePin = 0;
+
+    switch(pinNum) {
+        case 1:
+            pullDownPort = IO_1_PD_N_GPIO_Port;
+            pullDownPin = IO_1_PD_N_Pin;
+            pullUpPort = IO_1_PU_GPIO_Port;
+            pullUpPin = IO_1_PU_Pin;
+            triStatePort = IO_1_TRIS_N_GPIO_Port;
+            triStatePin = IO_1_TRIS_N_Pin;
+            break;
+        case 2:
+            pullDownPort = IO_2_PD_N_GPIO_Port;
+            pullDownPin = IO_2_PD_N_Pin;
+            pullUpPort = IO_2_PU_GPIO_Port;
+            pullUpPin = IO_2_PU_Pin;
+            triStatePort = IO_2_TRIS_N_GPIO_Port;
+            triStatePin = IO_2_TRIS_N_Pin;
+            break;
+        case 3:
+            pullDownPort = IO_3_PD_N_GPIO_Port;
+            pullDownPin = IO_3_PD_N_Pin;
+            pullUpPort = IO_3_PU_GPIO_Port;
+            pullUpPin = IO_3_PU_Pin;
+            triStatePort = IO_3_TRIS_N_GPIO_Port;
+            triStatePin = IO_3_TRIS_N_Pin;
+            break;
+        case 4:
+            pullDownPort = IO_4_PD_N_GPIO_Port;
+            pullDownPin = IO_4_PD_N_Pin;
+            pullUpPort = IO_4_PU_GPIO_Port;
+            pullUpPin = IO_4_PU_Pin;
+            triStatePort = IO_4_TRIS_N_GPIO_Port;
+            triStatePin = IO_4_TRIS_N_Pin;
+            break;
+        default:
+            return IOM_ERROR_INVALID;
+    }
+    uint8_t pullUp = (HAL_GPIO_ReadPin(pullUpPort, pullUpPin) == GPIO_PIN_SET) ? 1 : 0;
+    uint8_t pullDown = (HAL_GPIO_ReadPin(pullDownPort, pullDownPin) == GPIO_PIN_SET) ? 1 : 0;
+    uint8_t triState = (HAL_GPIO_ReadPin(triStatePort, triStatePin) == GPIO_PIN_SET) ? 1 : 0;
+
+    *comm = pinNum << 4 & 0x30;
+    if (pullDown != 0) {
+        *comm |= 0x01;
+    } else if (pullUp!= 0) {
+        *comm |= 0x02;
+    } else if (triState != 0) {
+        *comm |= 0x03;
+    }
+
+    //get VH
+    *(comm + 1) = ReadExtDAC(IOM_REGISTER_HIGH, IOM_REGISTER_HIGH, pinNum);
+    *(comm + 2) = ReadExtDAC(IOM_REGISTER_HIGH, IOM_REGISTER_LOW, pinNum);
+    ///get VL
+    *(comm + 3) = ReadExtDAC(IOM_REGISTER_LOW, IOM_REGISTER_HIGH, pinNum);
+    *(comm + 4) = ReadExtDAC(IOM_REGISTER_LOW, IOM_REGISTER_LOW, pinNum);
+
+    return IOM_OK;
 }
 
-void GetTargetDeviceVolt(uint8_t* comm)
+void GetTargetDeviceVoltage(uint8_t* comm)
 {
     //device volt is on Dac channel 1
     // last 12 bits are the channel 1 output

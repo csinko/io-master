@@ -24,9 +24,9 @@ IOM_ERROR WriteRegExtDAC(IOM_REGISTER register, uint8_t channel, uint16_t Vout);
 
 uint8_t ReadExtDAC(IOM_REGISTER register, IOM_REGISTER level, uint8_t channel);
 
-IOM_ERROR WriteMcuDAC(uint8_t channel, float Vout);
+IOM_ERROR WriteMCUDAC(uint8_t channel, float Vout);
 
-IOM_ERROR WriteRawMcuDAC(uint8_t channel, uint16_t dacVal);
+IOM_ERROR WriteRawMCUDAC(uint8_t channel, uint16_t dacVal);
 
 
 
