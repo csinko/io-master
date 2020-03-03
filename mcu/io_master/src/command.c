@@ -294,11 +294,10 @@ IOM_ERROR GetPinParams(uint8_t pinNum, uint8_t* comm)
     }
 
     //get VH
-    *(comm + 1) = ReadExtDAC(IOM_REGISTER_HIGH, IOM_REGISTER_HIGH, pinNum);
-    *(comm + 2) = ReadExtDAC(IOM_REGISTER_HIGH, IOM_REGISTER_LOW, pinNum);
-    ///get VL
-    *(comm + 3) = ReadExtDAC(IOM_REGISTER_LOW, IOM_REGISTER_HIGH, pinNum);
-    *(comm + 4) = ReadExtDAC(IOM_REGISTER_LOW, IOM_REGISTER_LOW, pinNum);
+    uint16_t* pVComm = (uint16_t*)(comm+1);
+    *pVComm = ReadExtDAC(IOM_REGISTER_HIGH, pinNum);
+    pVComm = (uint16_t*)(comm+3);
+    *pVComm = ReadExtDAC(IOM_REGISTER_LOW, pinNum);
 
     return IOM_OK;
 }
