@@ -37,8 +37,6 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Src/main.c \
-Src/usbd_conf.c \
-Src/usbd_desc.c \
 Src/stm32h7xx_it.c \
 Src/stm32h7xx_hal_msp.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pcd.c \
@@ -52,6 +50,9 @@ Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c \
+Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c \
+Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c \
+Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_usart.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c \
@@ -64,20 +65,17 @@ Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c \
 Src/system_stm32h7xx.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c
-Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
-Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
-Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
-Src/usbd_cdc_if.c \
-Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c \
+Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c \
 io_master/src/data.c \
 io_master/src/iopin.c \
+io_master/src/log.c \
+io_master/src/command.c \
 io_master/mcu/stm32h743/src/clock.c \
 io_master/mcu/stm32h743/src/dac.c \
 io_master/mcu/stm32h743/src/gpio.c \
 io_master/mcu/stm32h743/src/io_dma.c \
 io_master/mcu/stm32h743/src/timer.c \
-io_master/mcu/stm32h743/src/usb.c
+io_master/mcu/stm32h743/src/uart.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -217,3 +215,6 @@ clean:
 flash-openocd: $(BUILD_DIR)/$(TARGET).elf
 	openocd -f /usr/share/openocd/scripts/board/st_nucleo_h743zi.cfg -c init -c targets -c 'reset halt' -c 'flash write_image erase build/stm32h7_test_led.elf' -c 'reset halt' -c 'reset run' -c shutdown
 # *** EOF ***
+#
+openocd:
+	openocd -f /usr/share/openocd/scripts/board/st_nucleo_h743zi.cfg -c init -c targets -c 'reset_config none separate'

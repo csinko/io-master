@@ -26,7 +26,6 @@ extern "C" {
 
 #include "stm32h7xx_hal.h"
 #include "core.h"
-TIM_HandleTypeDef htim8;
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 

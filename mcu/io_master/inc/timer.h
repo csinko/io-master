@@ -5,6 +5,9 @@ extern "C" {
 #endif
 
 #include "core.h"
+#include "stm32h7xx_hal.h"
+
+TIM_HandleTypeDef htim8;
 
 IOM_ERROR InitTimers(void);
 

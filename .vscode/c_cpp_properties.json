@@ -31,6 +31,7 @@
                 "STM32H743xx"
             ],
             "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/arm-none-eabi-gcc",
             "browse": {
                 "path": [
                     "${workspaceFolder}",

@@ -1,7 +1,11 @@
 #include "io_dma.h"
 #include "main.h"
 #include "mcu_conf.h"
+#include "timer.h"
+#include "stm32h743xx.h"
 #include "stm32h7xx_hal.h"
+
+DMA_HandleTypeDef hdma_dma_generator0 = {0};
 
 IOM_ERROR InitDMA(void) {
   __HAL_RCC_DMA2_CLK_ENABLE();

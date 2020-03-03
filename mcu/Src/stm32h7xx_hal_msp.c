@@ -17,6 +17,7 @@
   ******************************************************************************
   */
 #include "main.h"
+#include "mcu_conf.h"
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 void HAL_MspInit(void)

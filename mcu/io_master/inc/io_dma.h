@@ -6,6 +6,9 @@ extern "C" {
 #endif
 
 #include "core.h"
+#include "stm32h7xx_hal.h"
+
+DMA_HandleTypeDef hdma_dma_generator0;
 
 
 IOM_ERROR InitDMA(void);

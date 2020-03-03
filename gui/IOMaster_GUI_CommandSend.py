@@ -71,7 +71,7 @@ def InitializePopup():
         global ser
         strg = txtin.get('1.0', TK.END)
         #ser = serial.Serial.port = strg.rstrip('n')
-        ser = serial.Serial(strg.rstrip('\n'), 1200,  serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
+        ser = serial.Serial(strg.rstrip('\n'), 57600,  serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
         OutConfigTxt.configure(state="normal")
         OutConfigTxt.insert(TK.END, "COM Port: " + strg + '\n')
         OutConfigTxt.configure(state="disable")
@@ -99,6 +99,7 @@ class combobox:
         self.cb=ttk.Combobox(win, values=values, state = "readonly")
 
 def Configure_Results():
+    print("Configure Results!")
     #Store VariablesI
     Protocol = cb0.cb.get()
     UVoltage = VHin.get('1.0', TK.END)
@@ -175,9 +176,10 @@ def Configure_Results():
         VL = float(LVoltage)
 
     #rewr=1 because we are writing, commandbits determines what we are setting, resister State is unknown
+    ### No Push No Pull, VH, VL
     rewr = 1
-    commandbits = 6
-    resisterStates = 2
+    commandbits = 1
+    resisterStates = 0
     byteSend(rewr, commandbits, resisterStates, VH, VL)
 
     #End Function
@@ -189,9 +191,10 @@ def byteSend(rewr, commandbits, resisterStates, VH, VL):
     combits = commandbits << 4
 
     commandByte = rewr | combits | resisterStates #byte 1
+    print(hex(commandByte))
 
-    TVH = round(((2**12 - 1) / 30) * (24 - VH))
-    TVL = round(((2**12 - 1) / 30) * (24 - VL))
+    TVH = round(((2**12 - 1) / 30) * (15 - VH))
+    TVL = round(((2**12 - 1) / 30) * (15 - VL))
 
     UVH = (TVH >> 8) & 0xff
     LVH = (TVH) & 0xff
@@ -209,6 +212,7 @@ def byteSend(rewr, commandbits, resisterStates, VH, VL):
 
     OutConfigTxt.insert(TK.END, Packet_Bytes.hex())
     OutConfigTxt.configure(state="disable")
+    print(Packet_Bytes)
 
     sendCommand(Packet_Bytes)
 

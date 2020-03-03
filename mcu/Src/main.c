@@ -24,8 +24,12 @@
 #include "gpio.h"
 #include "io_dma.h"
 #include "timer.h"
-#include "usb.h"
 #include "dac.h"
+#include "uart.h"
+#include "stm32h7xx_hal_dma.h"
+#include "stm32h743xx.h"
+#include "log.h"
+#include <stdlib.h>
 
 #if defined( __ICCARM__ )
   #define DMA_BUFFER \
@@ -35,7 +39,6 @@
       __attribute__((section(".dma_buffer")))
 #endif
 
-DMA_HandleTypeDef hdma_dma_generator0;
 uint8_t DMABusyFlag = 0;
 
 
@@ -43,22 +46,29 @@ uint8_t DMABusyFlag = 0;
 int main(void)
 {
   HAL_Init();
-
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
   InitSystemClock();
   InitGPIO();
   InitDAC();
-  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
-  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
-  unsigned int num1 = 0, num2 = 2048;
-  
-<<<<<<< HEAD
-  InitUSB();
-=======
-  MX_USB_DEVICE_Init();
->>>>>>> d7eb64f12b92b55fd141e6f82ebe27727dc2d393
-  InitTimers();
-  InitDMA();
-  GPIOF->ODR = 0xFFFF;
+  InitI2CDAC();
+  IOM_ERROR err = InitUART();
+  if (err == IOM_ERROR_INVALID) {
+    HAL_Delay(1000);
+  }
+  uint8_t* pData = malloc(1);
+  UARTQueueRXData(pData, 1);
+
+
+  //InitUSB();
+  //InitTimers();
+  //InitDMA();
+
+  while (1) {
+    HAL_GPIO_TogglePin(STATUS_B_GPIO_Port, STATUS_B_Pin);
+    HAL_Delay(1000);
+  }
+
+
   while (1)
   {
 
@@ -75,78 +85,5 @@ int main(void)
     }
   }
 }
-
-
-
-<<<<<<< HEAD
-/**
-  * @brief DAC1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_DAC1_Init(void)
-{
-
-  /* USER CODE BEGIN DAC1_Init 0 */
-
-  /* USER CODE END DAC1_Init 0 */
-
-  DAC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN DAC1_Init 1 */
-
-  /* USER CODE END DAC1_Init 1 */
-  /** DAC Initialization 
-  */
-  hdac1.Instance = DAC1;
-  if (HAL_DAC_Init(&hdac1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** DAC channel OUT1 config 
-  */
-  sConfig.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
-  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
-  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-  sConfig.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
-  sConfig.DAC_UserTrimming = DAC_TRIMMING_FACTORY;
-  if (HAL_DAC_ConfigChannel(&hdac1, &sConfig, DAC_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN DAC1_Init 2 */
-
-  /* USER CODE END DAC1_Init 2 */
-
-}
-=======
->>>>>>> d7eb64f12b92b55fd141e6f82ebe27727dc2d393
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    if(GPIO_Pin == USER_Btn_Pin) {
-      //Queue the data to be sent
-      uint8_t dataToSend = 0b10111111;
-      QueueOutputDataToSend(&dataToSend, 1, 1);
-    }
-}
-
-
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{ 
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,7 +1,6 @@
 #include "usb.h"
 #include "core.h"
 
-#include "usb_device.h"
 #include "usbd_core.h"
 #include "usbd_desc.h"
 #include "usbd_cdc.h"
@@ -9,6 +8,8 @@
 
 #include "stm32h7xx.h"
 #include "stm32h7xx_hal.h"
+
+USBD_HandleTypeDef hUsbDeviceFS = {0};
 
 IOM_ERROR InitUSB(void) {
   if (USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS) != USBD_OK)
