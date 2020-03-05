@@ -9,7 +9,6 @@ extern "C" {
 #include "stm32h7xx_hal.h"
 
 DMA_HandleTypeDef hdma_dma_generator0;
-uint8_t isSending;
 
 IOM_ERROR InitDMA(void);
 void StartDMATransfer(IOM_Output_Buffer* pBuffer);

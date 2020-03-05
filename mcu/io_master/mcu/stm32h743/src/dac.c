@@ -101,7 +101,7 @@
         break;
       case 3:
       case 4:
-        buf = io_dac_buf + 4;
+        buf = io_dac_buf + 8; //+8 because 2 channels at same time
         addr = IO_DAC_CH_3_4_ADDR;
         break;
       default:
@@ -110,7 +110,7 @@
         
 
     //Write Channel Registers
-    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 4, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 8, HAL_MAX_DELAY);
 
     //Update Voltages
     HAL_I2C_Master_Transmit(&hi2c3, IO_DAC_UPDATE_ADDR, &IO_DAC_UPDATE_BUF, 1, HAL_MAX_DELAY);
@@ -133,7 +133,7 @@
         break;
       case 3:
       case 4:
-        buf = io_dac_buf + 4;
+        buf = io_dac_buf + 8; //+8 because 2channels at same time
         addr = IO_DAC_CH_3_4_ADDR;
         break;
       default:
@@ -142,7 +142,7 @@
         
 
     //Write Channel Registers
-    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 4, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 8, HAL_MAX_DELAY);
     //errorLight(ret);
 
     //Update Voltages

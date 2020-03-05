@@ -18,6 +18,10 @@ IOM_ERROR InitTimers(void);
 IOM_ERROR EnableTimer(uint8_t pinNum);
 
 IOM_ERROR StartTimer(uint8_t pinNum);
+IOM_ERROR StopTimer(uint8_t pinNum);
+
+IOM_ERROR StartDMATimer();
+IOM_ERROR StopDMATimer();
 
 #ifdef __cplusplus
 }

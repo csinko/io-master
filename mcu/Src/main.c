@@ -50,7 +50,7 @@ int main(void)
   InitSystemClock();
   InitGPIO();
   InitDAC();
-  //InitI2CDAC();
+  InitI2CDAC();
   InitTimers();
   InitDMA();
   //InitUSB();
@@ -62,7 +62,7 @@ int main(void)
   uint8_t* pData = malloc(2);
   UARTQueueRXData(pData, 2);
 
-//  EnableTimer(1);
+    EnableTimer(1);
 //  StartTimer(1);
 //  EnableTimer(2);
 //  StartTimer(2);
@@ -71,24 +71,24 @@ int main(void)
 //  EnableTimer(4);
 //  StartTimer(4);
 
-  SetIOPinDataState(1, IOCFG_DATA_STATE_OUTPUT);
-  SetIOPinPolarity(1, IOCFG_POLARITY_FALSE);
-  SetIOPinIdleState(1, IOCFG_IDLE_STATE_LOW);
+  SetIOPinDataState(2, IOCFG_DATA_STATE_OUTPUT);
+  SetIOPinPolarity(2, IOCFG_POLARITY_FALSE);
+  SetIOPinIdleState(2, IOCFG_IDLE_STATE_LOW);
 
   while (1)
   {
-
     //If the output queue is not empty and the DMA is not busy
     uint32_t counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
-    if ((output_buf_queue_size > 0) && (counter == 0)) {
-      if (DMABusyFlag != 0) {
-        GPIOD->ODR = 0b0000000000000000;
-        ResetDMA();
-        DMABusyFlag = 0;
-      }
+    if ((output_buf_queue_size > 0) && (counter == 0) && (DMABusyFlag == 0)) {
       DMABusyFlag = 1;
       SendOutputData();
-      //Send the front of the output queue over DMA
+      while(DMABusyFlag == 1) {
+        counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
+        if (counter == 0) {
+          ResetDMA();
+          DMABusyFlag = 0;
+        }
+      }
     } 
   }
 }

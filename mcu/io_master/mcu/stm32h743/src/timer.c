@@ -10,9 +10,9 @@ IOM_ERROR InitTimers(void) {
 
   htim8.Instance = TIM8;
   TIM8->BDTR |= TIM_BDTR_MOE;
-  htim8.Init.Prescaler = 0;
+  htim8.Init.Prescaler = 32;
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim8.Init.Period = 10;
+  htim8.Init.Period = 100;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim8.Init.RepetitionCounter = 0;
   htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -27,7 +27,7 @@ IOM_ERROR InitTimers(void) {
 
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 10;
+  sConfigOC.Pulse = 50;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -68,9 +68,6 @@ IOM_ERROR InitTimers(void) {
   if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3) != HAL_OK) {
     return IOM_ERROR_INVALID; //TODO put a better error here
   }
-  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_4) != HAL_OK) {
-    return IOM_ERROR_INVALID; //TODO put a better error here
-  }
     TIM8->BDTR |= TIM_BDTR_MOE;
     return IOM_OK;
 
@@ -99,9 +96,9 @@ switch(pinNum) {
 
 
     htim2.Instance = TIM2;
-    htim2.Init.Prescaler = 0;
+    htim2.Init.Prescaler = 32;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 1000;
+    htim2.Init.Period = 100;
     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -124,7 +121,7 @@ switch(pinNum) {
       return IOM_ERROR_INTERFACE;
     }
     sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = 500;
+    sConfigOC.Pulse = 50;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
     if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -309,7 +306,47 @@ IOM_ERROR StartTimer(uint8_t pinNum) {
     default:
       return IOM_ERROR_INVALID;
   }
-
   return IOM_OK;
+}
 
+IOM_ERROR StopTimer(uint8_t pinNum) {
+  switch(pinNum) {
+    case 1:
+      if (HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1) != HAL_OK) {
+        return IOM_ERROR_INTERFACE;
+      }
+      break;
+    case 2:
+      if (HAL_TIM_PWM_Stop(&htim5, TIM_CHANNEL_2) != HAL_OK) {
+        return IOM_ERROR_INTERFACE;
+      }
+      break;
+    case 3:
+      if (HAL_TIM_PWM_Stop(&htim15, TIM_CHANNEL_1) != HAL_OK) {
+        return IOM_ERROR_INTERFACE;
+      }
+      break;
+    case 4:
+      if (HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_1) != HAL_OK) {
+        return IOM_ERROR_INTERFACE;
+      }
+      break;
+    default:
+      return IOM_ERROR_INVALID;
+  }
+  return IOM_OK;
+}
+
+IOM_ERROR StartDMATimer() {
+  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_4) != HAL_OK) {
+    return IOM_ERROR_INTERFACE;
+  }
+  return IOM_OK;
+}
+
+IOM_ERROR StopDMATimer() {
+  if (HAL_TIM_PWM_Stop(&htim8, TIM_CHANNEL_4) != HAL_OK) {
+    return IOM_ERROR_INTERFACE;
+  }
+  return IOM_OK;
 }

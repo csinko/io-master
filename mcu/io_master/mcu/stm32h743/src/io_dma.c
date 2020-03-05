@@ -6,7 +6,7 @@
 #include "stm32h7xx_hal.h"
 
 DMA_HandleTypeDef hdma_dma_generator0 = {0};
-uint8_t isSending = 0;
+
 IOM_ERROR InitDMA(void) {
   __HAL_RCC_DMA2_CLK_ENABLE();
 
@@ -32,17 +32,19 @@ __HAL_LINKDMA(&htim8, hdma[TIM_DMA_ID_CC4], hdma_dma_generator0);
 
 void StartDMATransfer(IOM_Output_Buffer* pBuffer) {
 //  HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)pBuffer->data, (uint32_t)(&((IO_PIN_GPIO_OUTPUT_PORT)->ODR)) + IO_PIN_GPIO_OUTPUT_OFFSET, pBuffer->length);
-  HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)pBuffer->data, (uint32_t)(&(GPIOD->ODR) + 1), pBuffer->length + 1);
-  isSending = 1;
+  HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)pBuffer->data, (uint32_t)(&(GPIOD->ODR)), pBuffer->length);
   HAL_GPIO_TogglePin(STATUS_B_GPIO_Port, STATUS_B_Pin);
   __HAL_TIM_ENABLE_DMA(&htim8, TIM_DMA_CC4);
+  StartTimer(1);
+  StartDMATimer();
 }
 
 void ResetDMA() {
+  StopTimer(1);
+  StopDMATimer();
   HAL_DMA_Abort((htim8.hdma[TIM_DMA_ID_CC4]));
   HAL_DMA_DeInit((htim8.hdma[TIM_DMA_ID_CC4]));
   HAL_DMA_Init((htim8.hdma[TIM_DMA_ID_CC4]));
   HAL_GPIO_TogglePin(STATUS_B_GPIO_Port, STATUS_B_Pin);
-  isSending = 0;
 }
 

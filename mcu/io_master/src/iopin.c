@@ -34,15 +34,42 @@ IOM_ERROR SetIOPinDataState(size_t pinNumber, IOCFG_DATA_STATE dataState) {
   IO_Pins[pinNumber-1].dataState = dataState;
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if (dataState == IOCFG_DATA_STATE_OUTPUT) {
-    if (pinNumber == 1) {
-      HAL_GPIO_DeInit(IO_1_OUT_GPIO_Port, IO_1_OUT_Pin);
-      GPIO_InitStruct.Pin = IO_1_OUT_Pin;
-      GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-      GPIO_InitStruct.Pull = GPIO_NOPULL;
-      GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-      HAL_GPIO_Init(IO_1_OUT_GPIO_Port, &GPIO_InitStruct);
+    switch (pinNumber) {
+      case 1:
+        HAL_GPIO_DeInit(IO_1_OUT_GPIO_Port, IO_1_OUT_Pin);
+        GPIO_InitStruct.Pin = IO_1_OUT_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        HAL_GPIO_Init(IO_1_OUT_GPIO_Port, &GPIO_InitStruct);
+        break;
+      case 2:
+        HAL_GPIO_DeInit(IO_2_OUT_GPIO_Port, IO_2_OUT_Pin);
+        GPIO_InitStruct.Pin = IO_2_OUT_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        HAL_GPIO_Init(IO_2_OUT_GPIO_Port, &GPIO_InitStruct);
+        break;
+      case 3:
+        HAL_GPIO_DeInit(IO_3_OUT_GPIO_Port, IO_3_OUT_Pin);
+        GPIO_InitStruct.Pin = IO_3_OUT_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        HAL_GPIO_Init(IO_3_OUT_GPIO_Port, &GPIO_InitStruct);
+        break;
+      case 4:
+        HAL_GPIO_DeInit(IO_4_OUT_GPIO_Port, IO_4_OUT_Pin);
+        GPIO_InitStruct.Pin = IO_4_OUT_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        HAL_GPIO_Init(IO_4_OUT_GPIO_Port, &GPIO_InitStruct);
+        break;
+      default:
+        return IOM_ERROR_INVALID;
     }
-    
   }
   return IOM_OK;
 }

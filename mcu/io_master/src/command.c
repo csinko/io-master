@@ -146,7 +146,8 @@ void ProcessDataCommand(IOM_Output_Buffer buffer) {
             return;
         case IOM_CS_DATA_LOAD:
             command_status = IOM_CS_NEW;
-            QueueOutputDataToSend(buffer.data, buffer.length, 1);
+            *(buffer.data) = 0b10101010;
+            QueueOutputDataToSend(buffer.data, buffer.length, 2);
             free(buffer.data);
             pData = malloc(2);
             UARTQueueRXData(pData, 2);
