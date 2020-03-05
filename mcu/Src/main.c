@@ -51,33 +51,29 @@ int main(void)
   InitGPIO();
   InitDAC();
   //InitI2CDAC();
+  InitTimers();
+  InitDMA();
+  //InitUSB();
+
   IOM_ERROR err = InitUART();
   if (err == IOM_ERROR_INVALID) {
     HAL_Delay(1000);
   }
-  uint8_t* pData = malloc(1);
-  UARTQueueRXData(pData, 1);
+  uint8_t* pData = malloc(2);
+  UARTQueueRXData(pData, 2);
 
-  EnableTimer(1);
-  StartTimer(1);
-  EnableTimer(2);
-  StartTimer(2);
-  EnableTimer(3);
-  StartTimer(3);
-  EnableTimer(4);
-  StartTimer(4);
+//  EnableTimer(1);
+//  StartTimer(1);
+//  EnableTimer(2);
+//  StartTimer(2);
+//  EnableTimer(3);
+//  StartTimer(3);
+//  EnableTimer(4);
+//  StartTimer(4);
 
-
-  //InitUSB();
-  //InitTimers();
-  //InitDMA();
-
-  while (1) {
-    HAL_GPIO_TogglePin(STATUS_B_GPIO_Port, STATUS_B_Pin);
-    HAL_Delay(1000);
-
-  }
-
+  SetIOPinDataState(1, IOCFG_DATA_STATE_OUTPUT);
+  SetIOPinPolarity(1, IOCFG_POLARITY_FALSE);
+  SetIOPinIdleState(1, IOCFG_IDLE_STATE_LOW);
 
   while (1)
   {
@@ -86,13 +82,14 @@ int main(void)
     uint32_t counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
     if ((output_buf_queue_size > 0) && (counter == 0)) {
       if (DMABusyFlag != 0) {
+        GPIOD->ODR = 0b0000000000000000;
         ResetDMA();
         DMABusyFlag = 0;
       }
       DMABusyFlag = 1;
       SendOutputData();
       //Send the front of the output queue over DMA
-    }
+    } 
   }
 }
 

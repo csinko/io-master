@@ -19,15 +19,21 @@ typedef enum {
 
 typedef enum {
     IOM_CS_NEW,
-    IOM_CS_INCOMPLETE,
+    IOM_CS_STATE,
+    IOM_CS_CONFIGURATION,
+    IOM_CS_DATA_INC,
+    IOM_CS_DATA_LOAD,
+    IOM_CS_DATA,
 } IOM_COMMAND_STATUS;
 
-uint8_t current_command[5];
+uint8_t current_command[128];
 
 IOM_COMMAND_STATUS command_status;
-
 void ProcessCommand(IOM_Output_Buffer buffer);
-void RunCommand(uint8_t* comm);
+void ProcessStateCommand(IOM_Output_Buffer buffer);
+void ProcessConfigurationCommand(IOM_Output_Buffer buffer);
+void ProcessDataCommand(IOM_Output_Buffer buffer);
+void RunConfigurationCommand(uint8_t* comm);
 IOM_ERROR SetPinParams(uint8_t pinNum, uint8_t* comm);
 void SetTargetDeviceVoltage(uint8_t* comm);
 void SetSignalMode(uint8_t* comm);

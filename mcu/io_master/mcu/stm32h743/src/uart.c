@@ -137,7 +137,6 @@ void USART1_IRQHandler(void)
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
-    HAL_GPIO_TogglePin(STATUS_G_GPIO_Port, STATUS_G_Pin);
     free(uart_sent_buf.data);
     uart_tx_state = IOM_QS_RDY;
     if (uart_tx_buf_queue_size > 0) {
@@ -148,6 +147,5 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
-    HAL_GPIO_TogglePin(STATUS_R_GPIO_Port, STATUS_R_Pin);
     UARTDequeueRXData();
 }

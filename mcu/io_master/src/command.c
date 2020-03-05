@@ -7,54 +7,187 @@
 #include <stdlib.h>
 #include "dac.h"
 #include "iopin.h"
+#include "data.h"
 
-uint8_t current_command[5] = {0};
+uint8_t current_command[128] = {0};
 IOM_COMMAND_STATUS command_status = IOM_CS_NEW;
 
 void ProcessCommand(IOM_Output_Buffer buffer) {
-    //New command, should be 1 byte
-    if(command_status == IOM_CS_NEW) {
-        if (buffer.length != 1) {
-            //Garbage
+    switch (command_status) {
+        case IOM_CS_NEW:
+            if (buffer.length != 2) {
+                //Garbage
+                free(buffer.data);
+                uint8_t* pData = malloc(2);
+                UARTQueueRXData(pData, 2);
+                return;
+            }
+            current_command[0] = *(buffer.data);
+            switch(current_command[0]) {
+                case 1:
+                    ProcessStateCommand(buffer);
+                    return;
+                case 2:
+                    ProcessConfigurationCommand(buffer);
+                    return;
+                case 3:
+                    ProcessDataCommand(buffer); 
+                    return;
+                default:
+                    free(buffer.data);
+                    uint8_t* pData = malloc(2);
+                    UARTQueueRXData(pData, 2);
+                    return;
+            }
+            break;
+        case IOM_CS_STATE:
+            ProcessStateCommand(buffer);
+            break;
+        case IOM_CS_CONFIGURATION:
+            ProcessConfigurationCommand(buffer);
+            break;
+        case IOM_CS_DATA:
+        case IOM_CS_DATA_INC:
+        case IOM_CS_DATA_LOAD:
+            ProcessDataCommand(buffer);
+            break;
+        default:
             free(buffer.data);
-            uint8_t* pData = malloc(1);
-            UARTQueueRXData(pData, 1);
+            uint8_t* pData = malloc(2);
+            UARTQueueRXData(pData, 2);
             return;
-        }
-        current_command[0] = *(buffer.data);
+    }
+}
+
+void ProcessConfigurationCommand(IOM_Output_Buffer buffer) {
+    if(command_status == IOM_CS_NEW) {
+        current_command[1] = *(buffer.data + 1);
         free(buffer.data);
-        uint8_t commTag = (current_command[0] & 0b01110000) >> 4;
+        uint8_t commTag = (current_command[1] & 0b01110000) >> 4;
         uint8_t bytesToGet = 1;
         if (commTag > 0 && commTag < 5) {
-            command_status = IOM_CS_INCOMPLETE;
+            command_status = IOM_CS_CONFIGURATION;
             bytesToGet = 4;
         } else if (commTag == 0) {
-            command_status = IOM_CS_INCOMPLETE;
+            command_status = IOM_CS_CONFIGURATION;
             bytesToGet = 2;
         }
         uint8_t* pData = malloc(bytesToGet);
         UARTQueueRXData(pData, bytesToGet);
         return;
     }
-    if (command_status == IOM_CS_INCOMPLETE) {
+    if (command_status == IOM_CS_CONFIGURATION) {
        if (buffer.length > 4) {
            //Garbage
            free(buffer.data);
-           uint8_t* pData = malloc(1);
-           UARTQueueRXData(pData, 1);
+           uint8_t* pData = malloc(2);
+           UARTQueueRXData(pData, 2);
            return;
        } 
-       memcpy(&current_command[1], buffer.data, buffer.length);
+       memcpy(&current_command[2], buffer.data, buffer.length);
        free(buffer.data);
        command_status = IOM_CS_NEW;
-       RunCommand(&current_command[0]);
-       uint8_t* pData = malloc(1);
-       UARTQueueRXData(pData, 1);
+       RunConfigurationCommand(&current_command[1]);
+       uint8_t* pData = malloc(2);
+       UARTQueueRXData(pData, 2);
        return;
     }
 }
 
-void RunCommand(uint8_t* comm)
+void ProcessDataCommand(IOM_Output_Buffer buffer) {
+    uint8_t* pData;
+    switch(command_status) {
+        case IOM_CS_NEW:
+            current_command[1] = *(buffer.data + 1);
+            free(buffer.data);
+            switch(current_command[1]) {
+                case 1:
+                    command_status = IOM_CS_DATA_INC;
+                    pData = malloc(1);
+                    UARTQueueRXData(pData, 1);
+                    return;
+                case 2:
+                    command_status = IOM_CS_DATA;
+                    pData = malloc(1);
+                    UARTQueueRXData(pData, 1);
+                    return;
+                default:
+                //Garbage
+                    pData = malloc(2);
+                    UARTQueueRXData(pData, 2);
+                    return;
+            }
+            break;
+        case IOM_CS_DATA_INC:
+            if (buffer.length != 1) {
+                //Garbage
+                free(buffer.data);
+                pData = malloc(2);
+                UARTQueueRXData(pData, 2);
+                return;
+            }
+            command_status = IOM_CS_DATA_LOAD;
+            pData = malloc(*(buffer.data));
+            free(buffer.data);
+            UARTQueueRXData(pData, 1);
+            return;
+        case IOM_CS_DATA:
+            if (buffer.length != 1) {
+                //Garbage
+                free(buffer.data);
+                pData = malloc(2);
+                UARTQueueRXData(pData, 2);
+            }
+            command_status = IOM_CS_NEW;
+            dataToReceive = *(buffer.data);
+            free(buffer.data);
+            pData = malloc(2);
+            UARTQueueRXData(pData, 2);
+            return;
+        case IOM_CS_DATA_LOAD:
+            command_status = IOM_CS_NEW;
+            QueueOutputDataToSend(buffer.data, buffer.length, 1);
+            free(buffer.data);
+            pData = malloc(2);
+            UARTQueueRXData(pData, 2);
+            return;
+        default:
+            //Garbage
+            command_status = IOM_CS_NEW;
+            free(buffer.data);
+            pData = malloc(2);
+            UARTQueueRXData(pData, 2);
+            return;
+    }
+}
+
+void ProcessStateCommand(IOM_Output_Buffer buffer) {
+    current_command[1] = *(buffer.data + 1);
+    free(buffer.data);
+    switch(current_command[1]) {
+        case 1:
+            IOMState = IOM_STATE_CONF;
+            break;
+        case 2:
+            IOMState = IOM_STATE_READY;
+            break;
+        case 3:
+            IOMState = IOM_STATE_BUSY;
+            break;
+        case 4:
+            IOMState = IOM_STATE_READY;
+            break;
+        default:
+            break;
+    }
+    command_status = IOM_CS_NEW;
+    uint8_t* pData = malloc(2);
+    UARTQueueRXData(pData, 2);
+    return;
+}
+
+
+void RunConfigurationCommand(uint8_t* comm)
 {
     uint8_t readWrite = (*(comm) & 0b10000000) >> 7;
     uint8_t commTag = (*(comm) & 0b01110000) >> 4;

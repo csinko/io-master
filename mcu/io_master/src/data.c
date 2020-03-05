@@ -10,6 +10,8 @@ uint8_t output_buf_queue_in_ptr = 0;
 uint8_t output_buf_queue_out_ptr = 0;
 uint8_t output_buf_queue_size = 0;
 
+uint8_t dataToReceive = 0;
+
 
 IOM_ERROR QueueOutputDataToSend(uint8_t* pData, size_t length, uint8_t pinNum) {
   ///Check if the data to send cannot fit in the end of the buffer
@@ -42,10 +44,10 @@ IOM_ERROR QueueOutputDataToSend(uint8_t* pData, size_t length, uint8_t pinNum) {
     //Set the byte in the output buffer to the current bit of data
     if (IO_Pins[pinNum-1].idleState == IOCFG_IDLE_STATE_HIGH) {
       //Idle high, set bits to low
-      *(output_buf_in_ptr) &= (((*(pData+i) >> (7 - j))& 0x01) == 0) ? ~(GetIOPinOutputMask(pinNum)) : 0xFF;
+      *(output_buf_in_ptr) &= (((*(pData+i) >> (7 - j))& 0x01) == 0) ? ~((GetIOPinOutputMask(pinNum) + 1)) : 0xFF;
     } else {
       //Idle low, set bits to high
-      *(output_buf_in_ptr) |= ((*(pData+i) >> (7 - j)) << GetIOPinOutputPos(pinNum)) & GetIOPinOutputMask(pinNum);
+      *(output_buf_in_ptr) |= ((*(pData+i) >> (7 - j)) << (GetIOPinOutputPos(pinNum) - 1)) & GetIOPinOutputMask(pinNum);
     }
     output_buf_in_ptr++;
     *(output_buf_in_ptr) = idle_pin_output;

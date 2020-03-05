@@ -101,7 +101,7 @@
         break;
       case 3:
       case 4:
-        buf = io_dac_buf + 8;
+        buf = io_dac_buf + 4;
         addr = IO_DAC_CH_3_4_ADDR;
         break;
       default:
@@ -110,7 +110,7 @@
         
 
     //Write Channel Registers
-    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 8, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 4, HAL_MAX_DELAY);
 
     //Update Voltages
     HAL_I2C_Master_Transmit(&hi2c3, IO_DAC_UPDATE_ADDR, &IO_DAC_UPDATE_BUF, 1, HAL_MAX_DELAY);
@@ -120,19 +120,20 @@
   IOM_ERROR WriteRegExtDAC(IOM_REGISTER reg, uint8_t channel, uint16_t Vout)
   {
     //HAL_StatusTypeDef ret;
-    io_dac_buf[(channel - 1) * 2 + reg] = Vout;
+    io_dac_buf[(channel - 1) * 4 + 2*reg] = (Vout >> 8) & 0x00FF;
+    io_dac_buf[(channel - 1) * 4 + 2*reg + 1] = (Vout) & 0x00FF;
 
     uint8_t *buf;
     uint16_t addr;
     switch(channel) {
       case 1:
       case 2:
-        buf = (uint8_t*) &io_dac_buf[0];
+        buf = io_dac_buf;
         addr = IO_DAC_CH_1_2_ADDR;
         break;
       case 3:
       case 4:
-        buf = (uint8_t*) &io_dac_buf[8];
+        buf = io_dac_buf + 4;
         addr = IO_DAC_CH_3_4_ADDR;
         break;
       default:
@@ -141,7 +142,7 @@
         
 
     //Write Channel Registers
-    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 8, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 4, HAL_MAX_DELAY);
     //errorLight(ret);
 
     //Update Voltages
