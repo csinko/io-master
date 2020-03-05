@@ -74,22 +74,31 @@ int main(void)
   SetIOPinDataState(2, IOCFG_DATA_STATE_OUTPUT);
   SetIOPinPolarity(2, IOCFG_POLARITY_FALSE);
   SetIOPinIdleState(2, IOCFG_IDLE_STATE_LOW);
+  SetIOPinDataState(4, IOCFG_DATA_STATE_OUTPUT);
+  SetIOPinPolarity(4, IOCFG_POLARITY_FALSE);
+  SetIOPinIdleState(4, IOCFG_IDLE_STATE_LOW);
 
+  HAL_GPIO_WritePin(IO_4_OUT_GPIO_Port, IO_4_OUT_Pin, GPIO_PIN_SET);
+
+  uint32_t counter;
   while (1)
   {
-    //If the output queue is not empty and the DMA is not busy
-    uint32_t counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
-    if ((output_buf_queue_size > 0) && (counter == 0) && (DMABusyFlag == 0)) {
-      DMABusyFlag = 1;
-      SendOutputData();
-      while(DMABusyFlag == 1) {
+    if (DMABusyFlag == 1) {
+      //Count down to 0 and wait for it to be done
+      counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
+      while(counter != 0) {
         counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
-        if (counter == 0) {
-          ResetDMA();
-          DMABusyFlag = 0;
-        }
+        HAL_GPIO_TogglePin(STATUS_R_GPIO_Port, STATUS_R_Pin);
       }
-    } 
+      ResetDMA();
+      HAL_GPIO_WritePin(STATUS_R_GPIO_Port, STATUS_R_Pin, GPIO_PIN_RESET);
+      DMABusyFlag = 0;
+    } else {
+      if (output_buf_queue_size > 0) {
+        DMABusyFlag = 1;
+        SendOutputData();
+      }
+    }
   }
 }
 

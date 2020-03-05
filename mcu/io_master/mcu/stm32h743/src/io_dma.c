@@ -31,9 +31,11 @@ __HAL_LINKDMA(&htim8, hdma[TIM_DMA_ID_CC4], hdma_dma_generator0);
 }
 
 void StartDMATransfer(IOM_Output_Buffer* pBuffer) {
+  TIM2->CNT = 0;
+  TIM8->CNT = 0;
+  HAL_GPIO_WritePin(IO_4_OUT_GPIO_Port, IO_4_OUT_Pin, GPIO_PIN_RESET);
 //  HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)pBuffer->data, (uint32_t)(&((IO_PIN_GPIO_OUTPUT_PORT)->ODR)) + IO_PIN_GPIO_OUTPUT_OFFSET, pBuffer->length);
   HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)pBuffer->data, (uint32_t)(&(GPIOD->ODR)), pBuffer->length);
-  HAL_GPIO_TogglePin(STATUS_B_GPIO_Port, STATUS_B_Pin);
   __HAL_TIM_ENABLE_DMA(&htim8, TIM_DMA_CC4);
   StartTimer(1);
   StartDMATimer();
@@ -42,9 +44,10 @@ void StartDMATransfer(IOM_Output_Buffer* pBuffer) {
 void ResetDMA() {
   StopTimer(1);
   StopDMATimer();
+  HAL_GPIO_WritePin(IO_4_OUT_GPIO_Port, IO_4_OUT_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(IO_2_OUT_GPIO_Port, IO_2_OUT_Pin, GPIO_PIN_RESET);
   HAL_DMA_Abort((htim8.hdma[TIM_DMA_ID_CC4]));
   HAL_DMA_DeInit((htim8.hdma[TIM_DMA_ID_CC4]));
   HAL_DMA_Init((htim8.hdma[TIM_DMA_ID_CC4]));
-  HAL_GPIO_TogglePin(STATUS_B_GPIO_Port, STATUS_B_Pin);
 }
 

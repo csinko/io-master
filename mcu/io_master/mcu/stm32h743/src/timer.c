@@ -12,7 +12,7 @@ IOM_ERROR InitTimers(void) {
   TIM8->BDTR |= TIM_BDTR_MOE;
   htim8.Init.Prescaler = 32;
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim8.Init.Period = 100;
+  htim8.Init.Period = 10;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim8.Init.RepetitionCounter = 0;
   htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -27,21 +27,21 @@ IOM_ERROR InitTimers(void) {
 
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 50;
+  sConfigOC.Pulse = 5;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    return IOM_ERROR_INVALID; //TODO put a better error here
-  }
+ // if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+ // {
+//  return IOM_ERROR_INVALID; //TODO put a better error here
+//  }
   sConfigOC.Pulse = 1;
-  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
-  {
-    return IOM_ERROR_INVALID; //TODO put a better error here
-  }
+//  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+ // {
+ //   return IOM_ERROR_INVALID; //TODO put a better error here
+ // }
   sConfigOC.Pulse = 1;
   if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
@@ -62,12 +62,12 @@ IOM_ERROR InitTimers(void) {
   //HAL_TIM_MspPostInit(&htim8); //TODO make this work
   TIM8->BDTR |= TIM_BDTR_MOE;
 
-  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1) != HAL_OK) {
-    return IOM_ERROR_INVALID; //TODO put a better error here
-  }
-  if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3) != HAL_OK) {
-    return IOM_ERROR_INVALID; //TODO put a better error here
-  }
+ // if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1) != HAL_OK) {
+//    return IOM_ERROR_INVALID; //TODO put a better error here
+ // }
+ // if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3) != HAL_OK) {
+ //   return IOM_ERROR_INVALID; //TODO put a better error here
+ // }
     TIM8->BDTR |= TIM_BDTR_MOE;
     return IOM_OK;
 
@@ -98,7 +98,7 @@ switch(pinNum) {
     htim2.Instance = TIM2;
     htim2.Init.Prescaler = 32;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 100;
+    htim2.Init.Period = 10;
     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -121,7 +121,7 @@ switch(pinNum) {
       return IOM_ERROR_INTERFACE;
     }
     sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = 50;
+    sConfigOC.Pulse = 5;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
     if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
