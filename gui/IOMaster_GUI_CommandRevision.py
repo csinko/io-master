@@ -230,14 +230,19 @@ def setStateToConfig():
     
 
 def byteSendVoltage(rewr, commandbits, resisterStates, VH, VL):
+    VH = VH + 1.3
     #rewr=1 bit, commandbits=3, resisterstate=4 bits
     rewr = rewr << 7
     combits = commandbits << 4
 
     commandByte = rewr | combits | resisterStates #byte 1
 
-    TVH = round(((2**12 - 1) / 30) * (24 - VH))
-    TVL = round(((2**12 - 1) / 30) * (24 - VL))
+    TVH = round(((2**12 - 1) / 33) * (16.5 - VH))
+    TVL = round(((2**12 - 1) / 33) * (16.5 - VL))
+    print("TVH")
+    print(TVH)
+    print("TVL")
+    print(TVL)
 
     UVH = (TVH >> 8) & 0xff
     LVH = (TVH) & 0xff
@@ -258,6 +263,8 @@ def byteSendVoltage(rewr, commandbits, resisterStates, VH, VL):
     OutConfigTxt.configure(state="disable")
 
     sendCommand(Packet_Bytes)
+    time.sleep(.1)
+
 
 #Setting any of the 4 bytes to NULL will skip that byte in the array
 def byteSendConfig(rewr, commandbits, resisterStates, byte2, byte3, byte4, byte5):
