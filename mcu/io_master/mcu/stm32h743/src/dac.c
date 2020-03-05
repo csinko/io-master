@@ -141,7 +141,7 @@
         
 
     //Write Channel Registers
-    HAL_I2C_Master_Transmit(&hi2c3, addr, &io_dac_buf[0], 8, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c3, addr, buf, 8, HAL_MAX_DELAY);
     //errorLight(ret);
 
     //Update Voltages

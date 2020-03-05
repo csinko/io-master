@@ -8,8 +8,16 @@ extern "C" {
 #include "stm32h7xx_hal.h"
 
 TIM_HandleTypeDef htim8;
+TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim5;
+TIM_HandleTypeDef htim15;
 
 IOM_ERROR InitTimers(void);
+
+IOM_ERROR EnableTimer(uint8_t pinNum);
+
+IOM_ERROR StartTimer(uint8_t pinNum);
 
 #ifdef __cplusplus
 }

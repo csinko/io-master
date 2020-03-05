@@ -50,13 +50,22 @@ int main(void)
   InitSystemClock();
   InitGPIO();
   InitDAC();
-  InitI2CDAC();
+  //InitI2CDAC();
   IOM_ERROR err = InitUART();
   if (err == IOM_ERROR_INVALID) {
     HAL_Delay(1000);
   }
   uint8_t* pData = malloc(1);
   UARTQueueRXData(pData, 1);
+
+  EnableTimer(1);
+  StartTimer(1);
+  EnableTimer(2);
+  StartTimer(2);
+  EnableTimer(3);
+  StartTimer(3);
+  EnableTimer(4);
+  StartTimer(4);
 
 
   //InitUSB();
