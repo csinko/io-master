@@ -56,7 +56,7 @@ def InitializePopup():
         global ser
         strg = txtin.get('1.0', TK.END)
         try:
-            ser = serial.Serial(strg.rstrip('\n'), 1200,  serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
+            ser = serial.Serial(strg.rstrip('\n'), 115200,  serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
         except:
             messagebox.showinfo("Error", "Could not open COM port")
             #InitializePopup()
@@ -79,6 +79,7 @@ def read_from_port(ser):
         """
 
 def sendCommand(command):
+    print(command.hex())
     try:
         ser.write(command)
     except:
@@ -242,6 +243,7 @@ def byteSendVoltage(rewr, commandbits, resisterStates, VH, VL):
     OutConfigTxt.configure(state="normal")
 
     Packet_Bytes = bytearray()
+    Packet_Bytes.append(2) #Byte0
     Packet_Bytes.append(commandByte)#byte1
     Packet_Bytes.append(UVH)#byte2
     Packet_Bytes.append(LVH)#byte3
@@ -397,6 +399,7 @@ class Button:
     def press(self):
         btn_text = self.btn.cget('text')
         if btn_text == "Configure":
+            setStateToConfig()
             Configure_Results()
 
         if btn_text == "Send Data":
