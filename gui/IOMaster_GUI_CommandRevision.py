@@ -205,10 +205,14 @@ def Configure_Results():
         VL = float(LVoltage)
 
     #rewr=1 because we are writing, commandbits determines what we are setting, resister State is unknown
-    rewr = int(WrRetxt.get('1.0', TK.END))
-    commandbits = int(ComBittxt.get('1.0', TK.END))
-    resisterStates = int(ResisStattxt.get('1.0', TK.END))
-    byteSendVoltage(rewr, commandbits, resisterStates, VH, VL)
+    #rewr = int(WrRetxt.get('1.0', TK.END))
+    #resisterStates = int(ResisStattxt.get('1.0', TK.END))
+    
+    byteSendVoltage(1, 1, 0, VH, VL)
+    byteSendVoltage(1, 2, 0, VH, VL)
+    byteSendVoltage(1, 3, 0, VH, VL)
+    byteSendVoltage(1, 4, 0, VH, VL)
+
 
     #End Function
 
