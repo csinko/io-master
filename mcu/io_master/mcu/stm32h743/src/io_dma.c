@@ -32,8 +32,6 @@ __HAL_LINKDMA(&htim8, hdma[TIM_DMA_ID_CC4], hdma_dma_generator0);
 }
 
 void StartDMATransfer(IOM_Output_Buffer* pBuffer) {
-  TIM2->CNT = 6;
-  TIM8->CNT = 0;
 //  HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)pBuffer->data, (uint32_t)(&((IO_PIN_GPIO_OUTPUT_PORT)->ODR)) + IO_PIN_GPIO_OUTPUT_OFFSET, pBuffer->length);
   bytesToSend = pBuffer->length;
   HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)pBuffer->data, (uint32_t)(&(GPIOD->ODR)), pBuffer->length);
@@ -43,9 +41,11 @@ void StartDMATransfer(IOM_Output_Buffer* pBuffer) {
   TIM8->BDTR |= TIM_BDTR_MOE;
   TIM8->DIER |= TIM_DIER_CC4IE;
   TIM2->CCER &= ~(TIM_CCER_CC1E);
-  TIM2->CCER |= TIM_CCER_CC1E;
+  //TIM2->CCER |= TIM_CCER_CC1E;
   TIM2->BDTR |= TIM_BDTR_MOE;
   GPIOD->ODR &= ~(IO_4_OUT_Pin);
+  TIM2->CNT = 5;
+  TIM8->CNT = 5;
   TIM8->CR1 |= TIM_CR1_CEN;
   TIM2->CR1 |= TIM_CR1_CEN;
   //StartTimer(1);

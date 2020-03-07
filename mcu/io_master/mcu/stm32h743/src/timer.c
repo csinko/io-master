@@ -32,7 +32,7 @@ IOM_ERROR InitTimers(void) {
 
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 5;
+  sConfigOC.Pulse = 9;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -272,8 +272,9 @@ IOM_ERROR StopDMATimer() {
 
 void TIM8_CC_IRQHandler() {
   //Disable flag
+  TIM2->CCER |= TIM_CCER_CC1E;
   TIM8->SR &= ~(TIM_SR_CC4IF);
-  if (bytesToSend == 0) {
+  if (bytesToSend == 1) {
     TIM2->CR1 &= ~(TIM_CR1_CEN);
     TIM8->CR1 &= ~(TIM_CR1_CEN);
     TIM2->CNT = 5;
