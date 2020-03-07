@@ -4,6 +4,7 @@
 #include "timer.h"
 #include "stm32h743xx.h"
 #include "stm32h7xx_hal.h"
+#include "data.h"
 
 DMA_HandleTypeDef hdma_dma_generator0 = {0};
 
@@ -31,20 +32,31 @@ __HAL_LINKDMA(&htim8, hdma[TIM_DMA_ID_CC4], hdma_dma_generator0);
 }
 
 void StartDMATransfer(IOM_Output_Buffer* pBuffer) {
-  TIM2->CNT = 0;
+  TIM2->CNT = 5;
   TIM8->CNT = 0;
-  HAL_GPIO_WritePin(IO_4_OUT_GPIO_Port, IO_4_OUT_Pin, GPIO_PIN_RESET);
 //  HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)pBuffer->data, (uint32_t)(&((IO_PIN_GPIO_OUTPUT_PORT)->ODR)) + IO_PIN_GPIO_OUTPUT_OFFSET, pBuffer->length);
+  bytesToSend = pBuffer->length;
   HAL_DMA_Start(htim8.hdma[TIM_DMA_ID_CC4], (uint32_t)pBuffer->data, (uint32_t)(&(GPIOD->ODR)), pBuffer->length);
   __HAL_TIM_ENABLE_DMA(&htim8, TIM_DMA_CC4);
-  StartTimer(1);
-  StartDMATimer();
+  TIM8->CCER &= ~(TIM_CCER_CC4E);
+  TIM8->CCER |= TIM_CCER_CC4E;
+  TIM8->BDTR |= TIM_BDTR_MOE;
+  TIM8->DIER |= TIM_DIER_CC4IE;
+  TIM2->CCER &= ~(TIM_CCER_CC1E);
+  TIM2->CCER |= TIM_CCER_CC1E;
+  TIM2->BDTR |= TIM_BDTR_MOE;
+  GPIOD->ODR &= ~(IO_4_OUT_Pin);
+  TIM8->CR1 |= TIM_CR1_CEN;
+  TIM2->CR1 |= TIM_CR1_CEN;
+  //StartTimer(1);
+  //StartDMATimer();
 }
 
 void ResetDMA() {
-  StopTimer(1);
-  StopDMATimer();
+  //StopTimer(1);
+  //StopDMATimer();
   HAL_GPIO_WritePin(IO_4_OUT_GPIO_Port, IO_4_OUT_Pin, GPIO_PIN_SET);
+  //HAL_GPIO_WritePin(IO_1_CLK_GPIO_Port, IO_1_CLK_Pin, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(IO_2_OUT_GPIO_Port, IO_2_OUT_Pin, GPIO_PIN_RESET);
   HAL_DMA_Abort((htim8.hdma[TIM_DMA_ID_CC4]));
   HAL_DMA_DeInit((htim8.hdma[TIM_DMA_ID_CC4]));

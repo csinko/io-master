@@ -79,6 +79,10 @@ int main(void)
   SetIOPinIdleState(4, IOCFG_IDLE_STATE_LOW);
 
   HAL_GPIO_WritePin(IO_4_OUT_GPIO_Port, IO_4_OUT_Pin, GPIO_PIN_SET);
+//  HAL_GPIO_WritePin(IO_1_CLK_GPIO_Port, IO_1_CLK_Pin, GPIO_PIN_RESET);
+//  TIM2->CNT = 0;
+//  TIM8->CNT = 0;
+  HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);
 
   uint32_t counter;
   while (1)
@@ -90,12 +94,14 @@ int main(void)
         counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
         HAL_GPIO_TogglePin(STATUS_R_GPIO_Port, STATUS_R_Pin);
       }
-      ResetDMA();
+      //ResetDMA();
       HAL_GPIO_WritePin(STATUS_R_GPIO_Port, STATUS_R_Pin, GPIO_PIN_RESET);
       DMABusyFlag = 0;
     } else {
       if (output_buf_queue_size > 0) {
         DMABusyFlag = 1;
+        HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);
+        HAL_Delay(1);
         SendOutputData();
       }
     }

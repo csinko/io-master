@@ -22,6 +22,7 @@ uint8_t output_buf_queue_out_ptr; ///< Index of queue of where to remove data
 uint8_t output_buf_queue_size; ///< The current size of the queue
 
 uint8_t dataToReceive;
+uint8_t bytesToSend;
 
 ///
 /// @brief puts a block of data into the output buffer

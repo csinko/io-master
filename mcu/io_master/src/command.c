@@ -147,6 +147,7 @@ void ProcessDataCommand(IOM_Output_Buffer buffer) {
             return;
         case IOM_CS_DATA_LOAD:
             command_status = IOM_CS_NEW;
+            uint8_t* pBuf = malloc(1);
             QueueOutputDataToSend(buffer.data, buffer.length, 2);
             free(buffer.data);
             pData = malloc(2);

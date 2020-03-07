@@ -11,6 +11,7 @@ uint8_t output_buf_queue_out_ptr = 0;
 uint8_t output_buf_queue_size = 0;
 
 uint8_t dataToReceive = 0;
+uint8_t bytesToSend = 0;
 
 
 IOM_ERROR QueueOutputDataToSend(uint8_t* pData, size_t length, uint8_t pinNum) {
