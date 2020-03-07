@@ -5,8 +5,53 @@
 #define CHECK_PIN(pin) if ((pin == 0) || (pin > NUM_IO_PINS)) \
                                   return IOM_ERROR_INVALID
 
+IOCFG IO_Pins[NUM_IO_PINS] = {0};
+uint8_t IOPinsInitialized = 0;
+
+IOM_ERROR InitIOPins() {
+  if (IOPinsInitialized != 0) {
+    return IOM_ERROR_NOT_ALLOWED;
+  }
+  for (int i = 0; i < NUM_IO_PINS; i++) {
+    IO_Pins[i].dataState = IOCFG_DATA_STATE_DISABLED;
+    IO_Pins[i].polarity = IOCFG_POLARITY_FALSE;
+    IO_Pins[i].idleState = IOCFG_IDLE_STATE_LOW;
+    IO_Pins[i].differential = IOCFG_DIFFERENTIAL_DISABLED;
+  }
+  return IOM_OK;
+}
+
 IOM_ERROR SetIOPinIdleState(size_t pinNumber, IOCFG_IDLE_STATE idleState) {
   CHECK_PIN(pinNumber);
+  if (idleState == IO_Pins[pinNumber-1].idleState) {
+    //Nothing to do, Idle state already set
+    return IOM_OK;
+  }
+  uint16_t ioPin = 0;
+  switch(pinNumber) {
+    case 1:
+      ioPin = IO_1_OUT_Pin;
+      break;
+    case 2:
+      ioPin = IO_2_OUT_Pin;
+      break;
+    case 3:
+      ioPin = IO_3_OUT_Pin;
+      break;
+    case 4:
+      ioPin = IO_4_OUT_Pin;
+      break;
+  }
+  switch(idleState) {
+    case IOCFG_IDLE_STATE_HIGH:
+      IO_PIN_GPIO_OUTPUT_PORT->ODR |= ioPin;
+      break;
+    case IOCFG_IDLE_STATE_LOW:
+      IO_PIN_GPIO_OUTPUT_PORT->ODR &= ~(ioPin);
+      break;
+    case IOCFG_IDLE_STATE_TRISTATE:
+      break;
+  }
   IO_Pins[pinNumber-1].idleState =  idleState;
   return IOM_OK;
 }
@@ -31,45 +76,35 @@ IOM_ERROR DisableDifferentialMode(size_t pinNumber) {
 
 IOM_ERROR SetIOPinDataState(size_t pinNumber, IOCFG_DATA_STATE dataState) {
   CHECK_PIN(pinNumber);
+  //If the pin already was configured for this, return IOM_OK
+  if (IO_Pins[pinNumber-1].dataState == dataState) {
+    return IOM_OK;
+  }
+  IOCFG_DATA_STATE lastState = IO_Pins[pinNumber-1].dataState;
   IO_Pins[pinNumber-1].dataState = dataState;
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if (dataState == IOCFG_DATA_STATE_OUTPUT) {
-    switch (pinNumber) {
-      case 1:
-        HAL_GPIO_DeInit(IO_1_OUT_GPIO_Port, IO_1_OUT_Pin);
-        GPIO_InitStruct.Pin = IO_1_OUT_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        HAL_GPIO_Init(IO_1_OUT_GPIO_Port, &GPIO_InitStruct);
-        break;
-      case 2:
-        HAL_GPIO_DeInit(IO_2_OUT_GPIO_Port, IO_2_OUT_Pin);
-        GPIO_InitStruct.Pin = IO_2_OUT_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        HAL_GPIO_Init(IO_2_OUT_GPIO_Port, &GPIO_InitStruct);
-        break;
-      case 3:
-        HAL_GPIO_DeInit(IO_3_OUT_GPIO_Port, IO_3_OUT_Pin);
-        GPIO_InitStruct.Pin = IO_3_OUT_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        HAL_GPIO_Init(IO_3_OUT_GPIO_Port, &GPIO_InitStruct);
-        break;
-      case 4:
-        HAL_GPIO_DeInit(IO_4_OUT_GPIO_Port, IO_4_OUT_Pin);
-        GPIO_InitStruct.Pin = IO_4_OUT_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        HAL_GPIO_Init(IO_4_OUT_GPIO_Port, &GPIO_InitStruct);
-        break;
-      default:
-        return IOM_ERROR_INVALID;
-    }
+  switch(dataState) {
+    case IOCFG_DATA_STATE_OUTPUT:
+    case IOCFG_DATA_STATE_CS:
+      if (lastState == IOCFG_DATA_STATE_CLOCK) {
+        DisableClockPin(pinNumber);
+      }
+      EnableOutputPin(pinNumber);
+
+    case IOCFG_DATA_STATE_CLOCK:
+      if (lastState == IOCFG_DATA_STATE_OUTPUT ||
+          lastState == IOCFG_DATA_STATE_CS) {
+            DisableOutputPin(pinNumber);
+      }
+      EnableClockPin(pinNumber);
+      break;
+    case IOCFG_DATA_STATE_INPUT:
+    case IOCFG_DATA_STATE_DISABLED:
+      if (lastState == IOCFG_DATA_STATE_CLOCK) {
+        DisableClockPin(pinNumber);
+      } else {
+        DisableOutputPin(pinNumber);
+      }
+      break;
   }
   return IOM_OK;
 }
@@ -126,5 +161,152 @@ uint8_t GetIOPinOutputPos(uint8_t pinNumber) {
     default:
       return 0;
   }
+}
+
+IOM_ERROR EnableOutputPin(uint8_t pinNumber) {
+  CHECK_PIN(pinNumber);
+  GPIO_TypeDef* outPort = 0;
+  uint16_t outPin = 0;
+  switch(pinNumber) {
+    case 1:
+      outPort = IO_1_OUT_GPIO_Port;
+      outPin = IO_1_OUT_Pin;
+      break;
+    case 2:
+      outPort = IO_2_OUT_GPIO_Port;
+      outPin = IO_2_OUT_Pin;
+      break;
+    case 3:
+      outPort = IO_3_OUT_GPIO_Port;
+      outPin = IO_3_OUT_Pin;
+      break;
+    case 4:
+      outPort = IO_4_OUT_GPIO_Port;
+      outPin = IO_4_OUT_Pin;
+  }
+  HAL_GPIO_DeInit(outPort, outPin);
+  switch(IO_Pins[pinNumber].idleState) {
+    case IOCFG_IDLE_STATE_HIGH:
+      IO_PIN_GPIO_OUTPUT_PORT->ODR |= outPin;
+      break;
+    case IOCFG_IDLE_STATE_LOW:
+      IO_PIN_GPIO_OUTPUT_PORT->ODR &= ~(outPin);
+      break;
+    case IOCFG_IDLE_STATE_TRISTATE:
+      break;
+  }
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  GPIO_InitStruct.Pin = outPin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(outPort, &GPIO_InitStruct);
+  return IOM_OK;
+
+}
+
+IOM_ERROR DisableOutputPin(uint8_t pinNumber) {
+  CHECK_PIN(pinNumber);
+  GPIO_TypeDef* outPort = 0;
+  uint16_t outPin = 0;
+  switch(pinNumber) {
+    case 1:
+      outPort = IO_1_OUT_GPIO_Port;
+      outPin = IO_1_OUT_Pin;
+      break;
+    case 2:
+      outPort = IO_2_OUT_GPIO_Port;
+      outPin = IO_2_OUT_Pin;
+      break;
+    case 3:
+      outPort = IO_3_OUT_GPIO_Port;
+      outPin = IO_3_OUT_Pin;
+      break;
+    case 4:
+      outPort = IO_4_OUT_GPIO_Port;
+      outPin = IO_4_OUT_Pin;
+  }
+  HAL_GPIO_DeInit(outPort, outPin);
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  GPIO_InitStruct.Pin = outPin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(outPort, &GPIO_InitStruct);
+  return IOM_OK;
+
+}
+
+IOM_ERROR EnableClockPin(uint8_t pinNumber) {
+  CHECK_PIN(pinNumber);
+  GPIO_TypeDef* clkPort = 0;
+  uint16_t clkPin = 0;
+  uint32_t alternate = 0;
+  switch(pinNumber) {
+    case 1:
+      clkPort = IO_1_CLK_GPIO_Port;
+      clkPin = IO_1_CLK_Pin;
+      alternate = GPIO_AF1_TIM2;
+      break;
+    case 2:
+      clkPort = IO_2_CLK_GPIO_Port;
+      clkPin = IO_2_CLK_Pin;
+      alternate = GPIO_AF2_TIM5;
+      break;
+    case 3:
+      clkPort = IO_3_CLK_GPIO_Port;
+      clkPin = IO_3_CLK_Pin;
+      alternate = GPIO_AF4_TIM15;
+      break;
+    case 4:
+      clkPort = IO_4_CLK_GPIO_Port;
+      clkPin = IO_4_CLK_Pin;
+      alternate = GPIO_AF2_TIM3;
+      break;
+  }
+  HAL_GPIO_DeInit(clkPort, clkPin);
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  GPIO_InitStruct.Pin = clkPin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = alternate;
+  HAL_GPIO_Init(clkPort, &GPIO_InitStruct);
+
+  return IOM_OK;
+}
+
+IOM_ERROR DisableClockPin(uint8_t pinNumber) {
+  CHECK_PIN(pinNumber);
+  GPIO_TypeDef* clkPort = 0;
+  uint16_t clkPin = 0;
+  switch(pinNumber) {
+    case 1:
+      clkPort = IO_1_CLK_GPIO_Port;
+      clkPin = IO_1_CLK_Pin;
+      break;
+    case 2:
+      clkPort = IO_2_CLK_GPIO_Port;
+      clkPin = IO_2_CLK_Pin;
+      break;
+    case 3:
+      clkPort = IO_3_CLK_GPIO_Port;
+      clkPin = IO_3_CLK_Pin;
+      break;
+    case 4:
+      clkPort = IO_4_CLK_GPIO_Port;
+      clkPin = IO_4_CLK_Pin;
+      break;
+  }
+  HAL_GPIO_DeInit(clkPort, clkPin);
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  GPIO_InitStruct.Pin = clkPin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(clkPort, &GPIO_InitStruct);
+
+  return IOM_OK;
+
 }
 

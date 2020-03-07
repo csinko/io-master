@@ -53,6 +53,7 @@ int main(void)
   InitI2CDAC();
   InitTimers();
   InitDMA();
+  InitIOPins();
   //InitUSB();
 
   IOM_ERROR err = InitUART();
@@ -62,26 +63,20 @@ int main(void)
   uint8_t* pData = malloc(2);
   UARTQueueRXData(pData, 2);
 
-    EnableTimer(1);
-//  StartTimer(1);
-//  EnableTimer(2);
-//  StartTimer(2);
-//  EnableTimer(3);
-//  StartTimer(3);
-//  EnableTimer(4);
-//  StartTimer(4);
+//Clock Pin
+  SetIOPinDataState(1, IOCFG_DATA_STATE_CLOCK);
+  SetIOPinPolarity(1, IOCFG_POLARITY_FALSE);
 
+//Output Pin
   SetIOPinDataState(2, IOCFG_DATA_STATE_OUTPUT);
   SetIOPinPolarity(2, IOCFG_POLARITY_FALSE);
   SetIOPinIdleState(2, IOCFG_IDLE_STATE_LOW);
-  SetIOPinDataState(4, IOCFG_DATA_STATE_OUTPUT);
+//CS Pin
+  SetIOPinDataState(4, IOCFG_DATA_STATE_CS);
   SetIOPinPolarity(4, IOCFG_POLARITY_FALSE);
-  SetIOPinIdleState(4, IOCFG_IDLE_STATE_LOW);
+  SetIOPinIdleState(4, IOCFG_IDLE_STATE_HIGH);
 
-  HAL_GPIO_WritePin(IO_4_OUT_GPIO_Port, IO_4_OUT_Pin, GPIO_PIN_SET);
-//  HAL_GPIO_WritePin(IO_1_CLK_GPIO_Port, IO_1_CLK_Pin, GPIO_PIN_RESET);
-//  TIM2->CNT = 0;
-//  TIM8->CNT = 0;
+//Write tristate due to current board issue
   HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);
 
   uint32_t counter;
@@ -100,6 +95,7 @@ int main(void)
     } else {
       if (output_buf_queue_size > 0) {
         DMABusyFlag = 1;
+        //Write tristate due to current board issue
         HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);
         HAL_Delay(1);
         SendOutputData();

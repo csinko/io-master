@@ -6,12 +6,16 @@
 #include "io_dma.h"
 
 IOM_ERROR InitTimers(void) {
+    __HAL_RCC_TIM2_CLK_ENABLE();
+    __HAL_RCC_TIM5_CLK_ENABLE();
+    __HAL_RCC_TIM15_CLK_ENABLE();
+    __HAL_RCC_TIM3_CLK_ENABLE();
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
 
   htim8.Instance = TIM8;
-  TIM8->BDTR |= TIM_BDTR_MOE;
   htim8.Init.Prescaler = 32;
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim8.Init.Period = 10;
@@ -22,7 +26,6 @@ IOM_ERROR InitTimers(void) {
   {
     return IOM_ERROR_INVALID; //TODO put a better error here
   }
-  TIM8->BDTR |= TIM_BDTR_MOE;
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig); 
@@ -35,22 +38,11 @@ IOM_ERROR InitTimers(void) {
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
- // if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
- // {
-//  return IOM_ERROR_INVALID; //TODO put a better error here
-//  }
-  sConfigOC.Pulse = 1;
-//  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
- // {
- //   return IOM_ERROR_INVALID; //TODO put a better error here
- // }
-  sConfigOC.Pulse = 1;
   if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     return IOM_ERROR_INVALID; //TODO put a better error here
   }
 
-  TIM8->BDTR |= TIM_BDTR_MOE;
 
   sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
   sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
@@ -61,44 +53,9 @@ IOM_ERROR InitTimers(void) {
   sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_ENABLE;
   HAL_TIMEx_ConfigBreakDeadTime(&htim8, &sBreakDeadTimeConfig);
 
-  //HAL_TIM_MspPostInit(&htim8); //TODO make this work
-  TIM8->BDTR |= TIM_BDTR_MOE;
 
- // if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1) != HAL_OK) {
-//    return IOM_ERROR_INVALID; //TODO put a better error here
- // }
- // if (HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3) != HAL_OK) {
- //   return IOM_ERROR_INVALID; //TODO put a better error here
- // }
-    TIM8->BDTR |= TIM_BDTR_MOE;
     HAL_NVIC_SetPriority(TIM8_CC_IRQn, 0, 1);
     HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
-
-    return IOM_OK;
-
-
-}
-
-IOM_ERROR EnableTimer(uint8_t pinNum) {
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_OC_InitTypeDef sConfigOC = {0};
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-
-switch(pinNum) {
-  case 1:
-    __HAL_RCC_TIM2_CLK_ENABLE();
-    HAL_GPIO_DeInit(IO_1_CLK_GPIO_Port, IO_1_CLK_Pin);
-
-
-
-    GPIO_InitStruct.Pin = IO_1_CLK_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
-    HAL_GPIO_Init(IO_1_CLK_GPIO_Port, &GPIO_InitStruct);
-
 
     htim2.Instance = TIM2;
     htim2.Init.Prescaler = 32;
@@ -134,22 +91,6 @@ switch(pinNum) {
       return IOM_ERROR_INTERFACE; //TODO put a better error here
     }
 
-    break;
-  case 2:
-
-    __HAL_RCC_TIM5_CLK_ENABLE();
-    HAL_GPIO_DeInit(IO_2_CLK_GPIO_Port, IO_2_CLK_Pin);
-
-
-
-    GPIO_InitStruct.Pin = IO_2_CLK_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
-    HAL_GPIO_Init(IO_2_CLK_GPIO_Port, &GPIO_InitStruct);
-
-
     htim2.Instance = TIM5;
     htim2.Init.Prescaler = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -183,20 +124,6 @@ switch(pinNum) {
     {
       return IOM_ERROR_INTERFACE;
     }
-    break;
-    case 3:
-
-    __HAL_RCC_TIM15_CLK_ENABLE();
-    HAL_GPIO_DeInit(IO_3_CLK_GPIO_Port, IO_3_CLK_Pin);
-
-    GPIO_InitStruct.Pin = IO_3_CLK_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF4_TIM15;
-    HAL_GPIO_Init(IO_3_CLK_GPIO_Port, &GPIO_InitStruct);
-
-
     htim2.Instance = TIM15;
     htim2.Init.Prescaler = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -230,19 +157,6 @@ switch(pinNum) {
     {
       return IOM_ERROR_INTERFACE;
     }
-    break;
-  case 4:
-    __HAL_RCC_TIM3_CLK_ENABLE();
-    HAL_GPIO_DeInit(IO_4_CLK_GPIO_Port, IO_4_CLK_Pin);
-
-    GPIO_InitStruct.Pin = IO_4_CLK_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
-    HAL_GPIO_Init(IO_4_CLK_GPIO_Port, &GPIO_InitStruct);
-
-
     htim2.Instance = TIM3;
     htim2.Init.Prescaler = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -276,13 +190,10 @@ switch(pinNum) {
     {
       return IOM_ERROR_INTERFACE;
     }
-    break;
-  default:
-    return IOM_ERROR_INVALID;
-}
+
+    return IOM_OK;
 
 
-return IOM_OK;
 }
 
 IOM_ERROR StartTimer(uint8_t pinNum) {
@@ -365,6 +276,7 @@ void TIM8_CC_IRQHandler() {
   if (bytesToSend == 0) {
     TIM2->CR1 &= ~(TIM_CR1_CEN);
     TIM8->CR1 &= ~(TIM_CR1_CEN);
+    TIM2->CNT = 5;
     ResetDMA();
   } else {
   bytesToSend--;

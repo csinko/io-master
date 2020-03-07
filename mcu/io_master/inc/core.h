@@ -18,6 +18,7 @@ typedef enum {
   IOM_ERROR_INVALID, ///< Invalid input
   IOM_ERROR_NOT_READY, ///< Not ready
   IOM_ERROR_INTERFACE, ///< Something went wrong with the interface
+  IOM_ERROR_NOT_ALLOWED, ///< Trying to use in a way that would cause issues
 } IOM_ERROR;
 
 typedef struct {

@@ -36,6 +36,7 @@ typedef enum {
   IOCFG_DATA_STATE_INPUT,
   IOCFG_DATA_STATE_OUTPUT,
   IOCFG_DATA_STATE_CLOCK,
+  IOCFG_DATA_STATE_CS,
 } IOCFG_DATA_STATE;
 
 typedef struct {
@@ -47,6 +48,9 @@ typedef struct {
 
 
 IOCFG IO_Pins[NUM_IO_PINS];
+uint8_t IOPinsInitialized;
+
+IOM_ERROR InitIOPins();
 
 IOM_ERROR SetIOPinIdleState(size_t pinNumber, IOCFG_IDLE_STATE idleState);
 IOM_ERROR SetIOPinPolarity(size_t pinNumber, IOCFG_POLARITY polarity);
@@ -57,6 +61,13 @@ IOM_ERROR GetDataState(uint8_t pinState, IOCFG_DATA_STATE* pDataState);
 
 uint8_t GetIOPinOutputMask(uint8_t pinNumber);
 uint8_t GetIOPinOutputPos(uint8_t pinNumber);
+
+IOM_ERROR EnableOutputPin(uint8_t pinNumber);
+IOM_ERROR DisableOutputPin(uint8_t pinNumber);
+
+IOM_ERROR EnableClockPin(uint8_t pinNumber);
+IOM_ERROR DisableClockPin(uint8_t pinNumber);
+
 
 
 

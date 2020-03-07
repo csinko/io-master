@@ -17,14 +17,14 @@ extern "C" {
 
 //IO Software Pin Definitions
 #define IO_PIN_GPIO_INPUT_PORT GPIOE
-#define IO_PIN_GPIO_INPUT_OFFSET 2
+#define IO_PIN_GPIO_INPUT_OFFSET 1
 #define IO_PIN_1_INPUT 8
 #define IO_PIN_2_INPUT 9
 #define IO_PIN_3_INPUT 10
 #define IO_PIN_4_INPUT 11
 
 #define IO_PIN_GPIO_OUTPUT_PORT GPIOD
-#define IO_PIN_GPIO_OUTPUT_OFFSET 3
+#define IO_PIN_GPIO_OUTPUT_OFFSET 0
 #define IO_PIN_1_OUTPUT 0
 #define IO_PIN_2_OUTPUT 1
 #define IO_PIN_3_OUTPUT 2
