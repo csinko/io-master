@@ -76,15 +76,16 @@ int main(void)
 //  SetIOPinPolarity(4, IOCFG_POLARITY_FALSE);
 //  SetIOPinIdleState(4, IOCFG_IDLE_STATE_HIGH);
 
-//SetIOPinIdleState(1, IOCFG_IDLE_STATE_HIGH);
-//SetIOPinIdleState(2, IOCFG_IDLE_STATE_HIGH);
-//SetIOPinIdleState(3, IOCFG_IDLE_STATE_HIGH);
-//SetIOPinIdleState(4, IOCFG_IDLE_STATE_HIGH);
+SetIOPinIdleState(1, IOCFG_IDLE_STATE_LOW);
+SetIOPinIdleState(2, IOCFG_IDLE_STATE_LOW);
+SetIOPinIdleState(3, IOCFG_IDLE_STATE_LOW);
+SetIOPinIdleState(4, IOCFG_IDLE_STATE_LOW);
 
-SetIOPinDataState(1, IOCFG_DATA_STATE_CLOCK);
-SetIOPinDataState(2, IOCFG_DATA_STATE_CLOCK);
-SetIOPinDataState(3, IOCFG_DATA_STATE_CLOCK);
-SetIOPinDataState(4, IOCFG_DATA_STATE_CLOCK);
+SetIOPinDataState(1, IOCFG_DATA_STATE_OUTPUT);
+SetIOPinDataState(2, IOCFG_DATA_STATE_OUTPUT);
+SetIOPinDataState(3, IOCFG_DATA_STATE_OUTPUT);
+SetIOPinDataState(4, IOCFG_DATA_STATE_OUTPUT);
+
 
 //Write tristate due to current board issue
   //HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);

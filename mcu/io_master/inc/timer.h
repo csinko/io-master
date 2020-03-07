@@ -21,6 +21,9 @@ IOM_ERROR StopTimer(uint8_t pinNum);
 IOM_ERROR StartDMATimer();
 IOM_ERROR StopDMATimer();
 
+uint32_t timerPeriod;
+uint32_t timerPulse;
+
 #ifdef __cplusplus
 }
 #endif

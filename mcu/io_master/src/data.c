@@ -48,7 +48,7 @@ IOM_ERROR QueueOutputDataToSend(uint8_t* pData, size_t length, uint8_t pinNum) {
       *(output_buf_in_ptr) &= (((*(pData+i) >> (7 - j))& 0x01) == 0) ? ~((GetIOPinOutputMask(pinNum) + 1)) : 0xFF;
     } else {
       //Idle low, set bits to high
-      *(output_buf_in_ptr) |= ((*(pData+i) >> (7 - j)) << (GetIOPinOutputPos(pinNum) - 1)) & GetIOPinOutputMask(pinNum);
+      *(output_buf_in_ptr) |= ((*(pData+i) >> (7 - j)) << (GetIOPinOutputPos(pinNum))) & GetIOPinOutputMask(pinNum);
     }
     output_buf_in_ptr++;
     *(output_buf_in_ptr) = idle_pin_output;

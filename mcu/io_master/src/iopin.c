@@ -1,6 +1,7 @@
 #include "iopin.h"
 #include "stm32h7xx_hal.h"
 #include "stm32h743xx.h"
+#include "timer.h"
 
 #define CHECK_PIN(pin) if ((pin == 0) || (pin > NUM_IO_PINS)) \
                                   return IOM_ERROR_INVALID
@@ -44,10 +45,10 @@ IOM_ERROR SetIOPinIdleState(size_t pinNumber, IOCFG_IDLE_STATE idleState) {
   }
   switch(idleState) {
     case IOCFG_IDLE_STATE_HIGH:
-      IO_PIN_GPIO_OUTPUT_PORT->ODR |= ioPin;
+      IO_PIN_GPIO_OUTPUT_PORT->ODR |= (ioPin << 1);
       break;
     case IOCFG_IDLE_STATE_LOW:
-      IO_PIN_GPIO_OUTPUT_PORT->ODR &= ~(ioPin);
+      IO_PIN_GPIO_OUTPUT_PORT->ODR &= ~((ioPin << 1));
       break;
     case IOCFG_IDLE_STATE_TRISTATE:
       break;
@@ -89,6 +90,7 @@ IOM_ERROR SetIOPinDataState(size_t pinNumber, IOCFG_DATA_STATE dataState) {
         DisableClockPin(pinNumber);
       }
       EnableOutputPin(pinNumber);
+      break;
 
     case IOCFG_DATA_STATE_CLOCK:
       if (lastState == IOCFG_DATA_STATE_OUTPUT ||
@@ -133,16 +135,17 @@ IOM_ERROR GetDataState(uint8_t pinState, IOCFG_DATA_STATE* pDataState) {
   return IOM_OK;
 }
 
+//TODO, this won't work if it is past GPIO7
 uint8_t GetIOPinOutputMask(uint8_t pinNumber) {
   switch(pinNumber) {
     case 1:
-      return (IO_PIN_1_OUTPUT + 1) % 8;
+      return IO_1_OUT_Pin;
     case 2:
-      return (IO_PIN_2_OUTPUT + 1) % 8;
+      return IO_2_OUT_Pin;
     case 3:
-      return (IO_PIN_3_OUTPUT + 1) % 8;
+      return IO_3_OUT_Pin;
     case 4:
-      return (IO_PIN_4_OUTPUT + 1) % 8;
+      return IO_4_OUT_Pin;
     default:
       return 0;
   }
@@ -151,13 +154,13 @@ uint8_t GetIOPinOutputMask(uint8_t pinNumber) {
 uint8_t GetIOPinOutputPos(uint8_t pinNumber) {
   switch(pinNumber) {
     case 1:
-      return (1 << IO_PIN_1_OUTPUT);
+      return IO_PIN_1_OUTPUT;
     case 2:
-      return (1 << IO_PIN_2_OUTPUT);
+      return IO_PIN_2_OUTPUT;
     case 3:
-      return (1 << IO_PIN_3_OUTPUT);
+      return IO_PIN_3_OUTPUT;
     case 4:
-      return (1 << IO_PIN_4_OUTPUT);
+      return IO_PIN_4_OUTPUT;
     default:
       return 0;
   }
@@ -187,10 +190,10 @@ IOM_ERROR EnableOutputPin(uint8_t pinNumber) {
   HAL_GPIO_DeInit(outPort, outPin);
   switch(IO_Pins[pinNumber].idleState) {
     case IOCFG_IDLE_STATE_HIGH:
-      IO_PIN_GPIO_OUTPUT_PORT->ODR |= outPin;
+      IO_PIN_GPIO_OUTPUT_PORT->ODR |= (outPin << 1);
       break;
     case IOCFG_IDLE_STATE_LOW:
-      IO_PIN_GPIO_OUTPUT_PORT->ODR &= ~(outPin);
+      IO_PIN_GPIO_OUTPUT_PORT->ODR &= ~((outPin << 1));
       break;
     case IOCFG_IDLE_STATE_TRISTATE:
       break;
@@ -278,7 +281,8 @@ IOM_ERROR EnableClockPin(uint8_t pinNumber) {
 
   pTimer->CCER |= channel;
   pTimer->BDTR |= TIM_BDTR_MOE;
-  pTimer->CNT = 10; //TODO, dynamically change this so it is always correct
+  pTimer->CNT = timerPeriod; //TODO, dynamically change this so it is always correct
+  pTimer->CR1 |= TIM_CR1_CEN;
   HAL_GPIO_DeInit(clkPort, clkPin);
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = clkPin;
