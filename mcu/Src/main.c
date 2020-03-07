@@ -64,20 +64,30 @@ int main(void)
   UARTQueueRXData(pData, 2);
 
 //Clock Pin
-  SetIOPinDataState(1, IOCFG_DATA_STATE_CLOCK);
-  SetIOPinPolarity(1, IOCFG_POLARITY_FALSE);
+//  SetIOPinDataState(1, IOCFG_DATA_STATE_CLOCK);
+//  SetIOPinPolarity(1, IOCFG_POLARITY_FALSE);
 
 //Output Pin
-  SetIOPinDataState(2, IOCFG_DATA_STATE_OUTPUT);
-  SetIOPinPolarity(2, IOCFG_POLARITY_FALSE);
-  SetIOPinIdleState(2, IOCFG_IDLE_STATE_LOW);
+//  SetIOPinDataState(2, IOCFG_DATA_STATE_OUTPUT);
+//  SetIOPinPolarity(2, IOCFG_POLARITY_FALSE);
+//  SetIOPinIdleState(2, IOCFG_IDLE_STATE_LOW);
 //CS Pin
-  SetIOPinDataState(4, IOCFG_DATA_STATE_CS);
-  SetIOPinPolarity(4, IOCFG_POLARITY_FALSE);
-  SetIOPinIdleState(4, IOCFG_IDLE_STATE_HIGH);
+//  SetIOPinDataState(4, IOCFG_DATA_STATE_CS);
+//  SetIOPinPolarity(4, IOCFG_POLARITY_FALSE);
+//  SetIOPinIdleState(4, IOCFG_IDLE_STATE_HIGH);
+
+//SetIOPinIdleState(1, IOCFG_IDLE_STATE_HIGH);
+//SetIOPinIdleState(2, IOCFG_IDLE_STATE_HIGH);
+//SetIOPinIdleState(3, IOCFG_IDLE_STATE_HIGH);
+//SetIOPinIdleState(4, IOCFG_IDLE_STATE_HIGH);
+
+SetIOPinDataState(1, IOCFG_DATA_STATE_CLOCK);
+SetIOPinDataState(2, IOCFG_DATA_STATE_CLOCK);
+SetIOPinDataState(3, IOCFG_DATA_STATE_CLOCK);
+SetIOPinDataState(4, IOCFG_DATA_STATE_CLOCK);
 
 //Write tristate due to current board issue
-  HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);
+  //HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);
 
   uint32_t counter;
   while (1)
@@ -96,7 +106,7 @@ int main(void)
       if (output_buf_queue_size > 0) {
         DMABusyFlag = 1;
         //Write tristate due to current board issue
-        HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);
+        //HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);
         HAL_Delay(1);
         SendOutputData();
       }

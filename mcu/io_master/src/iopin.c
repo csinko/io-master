@@ -242,28 +242,43 @@ IOM_ERROR EnableClockPin(uint8_t pinNumber) {
   GPIO_TypeDef* clkPort = 0;
   uint16_t clkPin = 0;
   uint32_t alternate = 0;
+  TIM_TypeDef* pTimer = 0;
+  uint32_t channel = 0;
   switch(pinNumber) {
     case 1:
       clkPort = IO_1_CLK_GPIO_Port;
       clkPin = IO_1_CLK_Pin;
       alternate = GPIO_AF1_TIM2;
+      pTimer = TIM2;
+      channel = TIM_CCER_CC1E;
       break;
     case 2:
       clkPort = IO_2_CLK_GPIO_Port;
       clkPin = IO_2_CLK_Pin;
       alternate = GPIO_AF2_TIM5;
+      pTimer = TIM5;
+      channel = TIM_CCER_CC2E;
+
       break;
     case 3:
       clkPort = IO_3_CLK_GPIO_Port;
       clkPin = IO_3_CLK_Pin;
       alternate = GPIO_AF4_TIM15;
+      pTimer = TIM15;
+      channel = TIM_CCER_CC1E;
       break;
     case 4:
       clkPort = IO_4_CLK_GPIO_Port;
       clkPin = IO_4_CLK_Pin;
       alternate = GPIO_AF2_TIM3;
+      pTimer = TIM3;
+      channel = TIM_CCER_CC1E;
       break;
   }
+
+  pTimer->CCER |= channel;
+  pTimer->BDTR |= TIM_BDTR_MOE;
+  pTimer->CNT = 10; //TODO, dynamically change this so it is always correct
   HAL_GPIO_DeInit(clkPort, clkPin);
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = clkPin;

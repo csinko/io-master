@@ -94,7 +94,7 @@ IOM_ERROR InitTimers(void) {
     htim2.Instance = TIM5;
     htim2.Init.Prescaler = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 100;
+    htim2.Init.Period = 10;
     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_Base_Init(&htim5) != HAL_OK)
@@ -117,7 +117,7 @@ IOM_ERROR InitTimers(void) {
       return IOM_ERROR_INTERFACE;
     }
     sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = 50;
+    sConfigOC.Pulse = 5;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
     if (HAL_TIM_PWM_ConfigChannel(&htim5, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
@@ -127,7 +127,7 @@ IOM_ERROR InitTimers(void) {
     htim2.Instance = TIM15;
     htim2.Init.Prescaler = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 1000;
+    htim2.Init.Period = 10;
     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_Base_Init(&htim15) != HAL_OK)
@@ -150,7 +150,7 @@ IOM_ERROR InitTimers(void) {
       return IOM_ERROR_INTERFACE;
     }
     sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = 500;
+    sConfigOC.Pulse = 5;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
     if (HAL_TIM_PWM_ConfigChannel(&htim15, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -160,7 +160,7 @@ IOM_ERROR InitTimers(void) {
     htim2.Instance = TIM3;
     htim2.Init.Prescaler = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 1000;
+    htim2.Init.Period = 10;
     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -183,7 +183,7 @@ IOM_ERROR InitTimers(void) {
       return IOM_ERROR_INTERFACE;
     }
     sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = 500;
+    sConfigOC.Pulse = 5;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
     if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -200,9 +200,6 @@ IOM_ERROR StartTimer(uint8_t pinNum) {
 
   switch(pinNum) {
     case 1:
-      TIM2->CCER &= ~(TIM_CCER_CC1E);
-      TIM2->CCER |= TIM_CCER_CC1E;
-      TIM2->BDTR |= TIM_BDTR_MOE;
       TIM2->CR1 |= TIM_CR1_CEN;
       break;
     case 2:
