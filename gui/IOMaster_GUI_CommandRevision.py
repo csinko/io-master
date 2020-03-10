@@ -263,7 +263,7 @@ def byteSendVoltage(rewr, commandbits, resisterStates, VH, VL):
     OutConfigTxt.configure(state="disable")
 
     sendCommand(Packet_Bytes)
-    time.sleep(.1)
+    time.sleep(.25)
 
 
 #Setting any of the 4 bytes to NULL will skip that byte in the array
