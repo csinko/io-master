@@ -9,8 +9,65 @@
 #include "iopin.h"
 #include "data.h"
 
-uint8_t current_command[128] = {0};
-IOM_COMMAND_STATUS command_status = IOM_CS_NEW;
+#define COMMAND_BUF_QUEUE_MAX_SIZE 512
+
+uint8_t command_buf_queue[COMMAND_BUF_QUEUE_MAX_SIZE] = {0}; 
+uint16_t command_buf_in_ptr = 0;
+uint16_t command_buf_out_ptr = 0;
+uint16_t command_buf_queue_size = 0;
+
+IOM_Output_Buffer current_command = {};
+
+IOM_ERROR QueueCommand(uint8_t* pCommand) {
+    if (command_buf_queue_size >= COMMAND_BUF_QUEUE_MAX_SIZE) {
+        return IOM_ERROR_QUEUE_FULL;
+    }
+    command_buf_queue[command_buf_in_ptr] = *pCommand;
+    free(pCommand);
+    command_buf_in_ptr++;
+    command_buf_queue_size++;
+    return IOM_OK;
+}
+
+IOM_ERROR ProcessCommand() {
+    if (command_buf_queue_size == 0) {
+        return IOM_ERROR_QUEUE_EMPTY;
+    }
+    while (command_buf_queue_size > 0) {
+        //All commands are at least 2 bytes in length
+        //If there are not 2 bytes yet, just load the data
+        switch(current_command.length) {
+            case 0:
+                current_command.data = &command_buf_queue[command_buf_out_ptr];
+                //no break, fall through to 1
+            case 1:
+                current_command.length++;
+                continue; 
+            default:
+                break;
+        }
+        switch(*(current_command.data)) {
+            case IOM_CMD_TYPE_STATE:
+                switch(*(current_command.data + 1)) {
+                    case IOM_STATE_CMD_GET:
+                        break;
+                    case IOM_STATE_CMD_SET_CONFIG:
+                        break;
+                    case IOM_STATE_CMD_SET_RUN:
+                        break;
+                    case IOM_STATE_CMD_SET_STOP
+                        break;
+                }
+                break;
+            case IOM_CMD_TYPE_CONFIGURATION:
+                break;
+            case IOM_CMD_TYPE_DATA:
+                break;
+        }
+    }
+
+}
+
 
 void ProcessCommand(IOM_Output_Buffer buffer) {
     switch (command_status) {

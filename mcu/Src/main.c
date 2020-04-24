@@ -81,10 +81,10 @@ SetIOPinIdleState(2, IOCFG_IDLE_STATE_LOW);
 SetIOPinIdleState(3, IOCFG_IDLE_STATE_LOW);
 SetIOPinIdleState(4, IOCFG_IDLE_STATE_LOW);
 
-SetIOPinDataState(1, IOCFG_DATA_STATE_OUTPUT);
-SetIOPinDataState(2, IOCFG_DATA_STATE_OUTPUT);
-SetIOPinDataState(3, IOCFG_DATA_STATE_OUTPUT);
-SetIOPinDataState(4, IOCFG_DATA_STATE_OUTPUT);
+SetIOPinDataState(1, IOCFG_DATA_STATE_CLOCK);
+SetIOPinDataState(2, IOCFG_DATA_STATE_CLOCK);
+SetIOPinDataState(3, IOCFG_DATA_STATE_CLOCK);
+SetIOPinDataState(4, IOCFG_DATA_STATE_CLOCK);
 
 
 //Write tristate due to current board issue
@@ -114,12 +114,13 @@ SetIOPinDataState(4, IOCFG_DATA_STATE_OUTPUT);
         }
       case IOM_STATE_CONF:
       case IOM_STATE_READY:
-
+      if (command_buf_queue_size > 0) {
+        ProcessCommand();
+      }
         break;
       case IOM_STATE_ERROR:
           HAL_GPIO_TogglePin(STATUS_R_GPIO_Port, STATUS_R_GPIO_Pin);
         break;
-    }
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
