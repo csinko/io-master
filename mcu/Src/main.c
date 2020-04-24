@@ -93,26 +93,33 @@ SetIOPinDataState(4, IOCFG_DATA_STATE_OUTPUT);
   uint32_t counter;
   while (1)
   {
-    if (DMABusyFlag == 1) {
-      //Count down to 0 and wait for it to be done
-      counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
-      while(counter != 0) {
-        counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
-        HAL_GPIO_TogglePin(STATUS_R_GPIO_Port, STATUS_R_Pin);
-      }
-      //ResetDMA();
-      HAL_GPIO_WritePin(STATUS_R_GPIO_Port, STATUS_R_Pin, GPIO_PIN_RESET);
-      DMABusyFlag = 0;
-    } else {
-      if (output_buf_queue_size > 0) {
-        DMABusyFlag = 1;
-        //Write tristate due to current board issue
-        //HAL_GPIO_WritePin(IO_1_TRIS_N_GPIO_Port, IO_1_TRIS_N_Pin, GPIO_PIN_RESET);
-        HAL_Delay(1);
-        SendOutputData();
-      }
+    switch(IOMState) {
+      case IOM_STATE_INIT:
+        IOMState = IOM_STATE_READY;
+        break;
+      case IOM_STATE_BUSY:
+        if (DMABusyFlag == 1) {
+          counter = __HAL_DMA_GET_COUNTER(htim8.hdma[TIM_DMA_ID_CC4]);
+          if (counter != 0) {
+            HAL_GPIO_TogglePin(STATUS_G_GPIO_Port, STATUS_G_Pin);
+          } else {
+            HAL_GPIO_WritePin(STATUS_G_GPIO_Port, STATUS_G_Pin, GPIO_PIN_RESET);
+            DMABusyFlag = 0;
+          }
+        } else {
+          if (output_buf_queue_size > 0) {
+            DMABusyFlag = 1;
+            SendOutputData();
+          }
+        }
+      case IOM_STATE_CONF:
+      case IOM_STATE_READY:
+
+        break;
+      case IOM_STATE_ERROR:
+          HAL_GPIO_TogglePin(STATUS_R_GPIO_Port, STATUS_R_GPIO_Pin);
+        break;
     }
-  }
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
